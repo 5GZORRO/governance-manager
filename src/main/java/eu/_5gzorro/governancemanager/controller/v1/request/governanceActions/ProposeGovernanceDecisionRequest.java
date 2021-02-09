@@ -1,7 +1,8 @@
 package eu._5gzorro.governancemanager.controller.v1.request.governanceActions;
 
 import eu._5gzorro.governancemanager.dto.ActionParamsDto;
-import eu._5gzorro.governancemanager.model.enumeration.ActionType;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -9,18 +10,19 @@ import java.util.Objects;
 
 public class ProposeGovernanceDecisionRequest {
 
-    @NotNull
-    private ActionType actionType;
+  @NotNull
+  @Schema(allowableValues = {"NEW_LEGAL_PROSE_TEMPLATE","ARCHIVE_LEGAL_PROSE_TEMPLATE","SLA_DISPUTE"}, type = "String")
+  private GovernanceActionType actionType;
 
     @NotNull
     @Valid
     private ActionParamsDto actionParams;
 
-    public ActionType getActionType() {
+    public GovernanceActionType getActionType() {
         return actionType;
     }
 
-    public void setActionType(ActionType actionType) {
+    public void setActionType(GovernanceActionType actionType) {
         this.actionType = actionType;
     }
 
