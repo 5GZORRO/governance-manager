@@ -4,6 +4,8 @@ import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.Pro
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.enumeration.ActionType;
 import eu._5gzorro.governancemanager.model.enumeration.ProposalStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ import java.util.Optional;
 
 @RestController
 public class GovernanceActionsControllerImpl implements GovernanceActionsController {
+
+    private static final Logger log = LogManager.getLogger(GovernanceActionsControllerImpl.class);
+
     @Override
     public ResponseEntity<String> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
         return ResponseEntity
