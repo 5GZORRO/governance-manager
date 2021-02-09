@@ -1,4 +1,4 @@
-package eu._5gzorro.governancemanager.controller.v1;
+package eu._5gzorro.governancemanager.controller.advice;
 
 
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
