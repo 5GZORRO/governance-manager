@@ -17,7 +17,6 @@ public class GovernanceManagerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(GovernanceManagerApplication.class, args);
-		log.error("testing 1234567");
 	}
 
 }

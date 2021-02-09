@@ -1,6 +1,7 @@
 package eu._5gzorro.governancemanager.controller.v1.api;
 
 import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
+import eu._5gzorro.governancemanager.controller.v1.response.PagedMembersResponse;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +34,7 @@ public class MembershipsControllerImpl implements MembershipsController {
     }
 
     @Override
-    public ResponseEntity<Page<MemberDto>> getMembers(Pageable pageable, Optional<String> filterText) {
+    public ResponseEntity<PagedMembersResponse> getMembers(Pageable pageable, Optional<String> filterText) {
         return ResponseEntity
                 .ok()
                 .body(null);
