@@ -3,9 +3,9 @@ package eu._5gzorro.governancemanager.service;
 import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
-import eu._5gzorro.governancemanager.model.MemberNotificationSettingsMapper;
+import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
+import eu._5gzorro.governancemanager.model.mapper.MemberNotificationSettingsMapper;
 import eu._5gzorro.governancemanager.model.entity.Member;
-import eu._5gzorro.governancemanager.model.entity.MemberNotificationSetting;
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.repository.MemberRepository;
@@ -15,13 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -63,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
         if(member.isEmpty())
             throw new MemberNotFoundException(id);
 
-        return mapper.map(member.get(), MembershipStatusDto.class);
+        return MemberMapper.toMembershipStatusDto(member.get());
     }
 
     @Override

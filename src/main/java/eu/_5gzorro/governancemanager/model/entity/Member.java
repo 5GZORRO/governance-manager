@@ -4,13 +4,14 @@ import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name="member")
+@Table(name="member", indexes = {
+        @Index(name = "ix_name", columnList = "legal_name"),
+})
 public class Member {
 
     @Id
