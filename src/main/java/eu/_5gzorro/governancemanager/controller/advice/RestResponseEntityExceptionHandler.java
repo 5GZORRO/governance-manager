@@ -2,6 +2,8 @@ package eu._5gzorro.governancemanager.controller.advice;
 
 
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
+import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -52,5 +56,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         }
 
         return super.handleExceptionInternal(ex, response, headers, status, request);
+    }
+
+    @ExceptionHandler({ MemberNotFoundException.class })
+    @ResponseStatus(value=HttpStatus.NOT_FOUND)
+    @ResponseBody
+    protected ApiErrorResponse handleEntityNofFoundException(HttpServletRequest req, Exception ex) {
+        ApiErrorResponse response = new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return response;
     }
 }
