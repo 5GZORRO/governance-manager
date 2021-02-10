@@ -1,4 +1,4 @@
-package eu._5gzorro.governancemanager.validators;
+package eu._5gzorro.governancemanager.validator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

@@ -48,7 +48,7 @@ public interface GovernanceActionsController {
     @GetMapping
     @PageableOperation
     ResponseEntity<PagedGovernanceProposalsResponse> getProposals(
-            @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,
+            final @Parameter(hidden = true) Pageable pageable,
             @RequestParam(required = false) @Parameter(description = "Optional comma separated list of proposalStatus' to filter the response by") final Optional<List<ProposalStatus>> statusFilter,
             @RequestParam(required = false) @Parameter(description = "Optional comma separated list of actionTypes to filter the response by") final Optional<List<GovernanceActionType>> actionTypeFilter);
 

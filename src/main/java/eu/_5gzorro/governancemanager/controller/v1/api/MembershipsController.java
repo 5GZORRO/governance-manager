@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 
 @RequestMapping("/api/v1/memberships")
@@ -58,8 +57,8 @@ public interface MembershipsController {
     @GetMapping
     @PageableOperation
     ResponseEntity<PagedMembersResponse> getMembers(
-            @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,
-            @RequestParam(required = false) @Parameter(description = "String to filter members by name containing this text") final Optional<String> filterText);
+            final @Parameter(hidden = true) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") @Parameter(description = "String to filter members by name containing this text") final String filterText);
 
 
     @Operation(description = "Request to revoke 5GZORRO stakeholder membership with a given stakeholder Id.  Decision to uphold the request is subject to governance if the request is not for the requesting stakeholder")
