@@ -1,10 +1,11 @@
 package eu._5gzorro.governancemanager.controller.v1.api;
 
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
+import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.PageableOperation;
-import eu._5gzorro.governancemanager.model.enumeration.ActionType;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.ProposalStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,13 +13,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/api/v1/governance-actions")
@@ -40,16 +41,16 @@ public interface GovernanceActionsController {
     @Operation(description = "Retrieve a paged collection of 5GZORRO governance proposals according to paging and filter parameters", tags= { "Governance - All Stakeholders" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "A Paged List of Proposals",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = PagedGovernanceProposalsResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid page or filter parameters provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping
     @PageableOperation
-    ResponseEntity<Page<GovernanceProposalDto>> getProposals(
+    ResponseEntity<PagedGovernanceProposalsResponse> getProposals(
             @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,
-            @RequestParam(required = false) final Optional<ProposalStatus> statusFilter,
-            @RequestParam(required = false) final Optional<ActionType> actionTypeFilter);
+            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of proposalStatus' to filter the response by") final Optional<List<ProposalStatus>> statusFilter,
+            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of actionTypes to filter the response by") final Optional<List<GovernanceActionType>> actionTypeFilter);
 
 
     @Operation(description = "Retrieve a 5GZORRO governance proposal including current status information", tags= { "Governance - All Stakeholders" })
