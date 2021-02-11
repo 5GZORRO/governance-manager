@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 
 @RequestMapping("/api/v1/memberships")
@@ -63,7 +64,7 @@ public interface MembershipsController {
 
     @Operation(description = "Request to revoke 5GZORRO stakeholder membership with a given stakeholder Id.  Decision to uphold the request is subject to governance if the request is not for the requesting stakeholder")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Request was submitted successfully",
+            @ApiResponse(responseCode = "200", description = "Request was submitted successfully. If requesting revocation for another stakeholder the Id of the associated governance proposal will be returned",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "The request failed validation checks",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -71,5 +72,5 @@ public interface MembershipsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @DeleteMapping("{stakeholderId}/revoke-membership")
-    ResponseEntity revokeMembership(@Valid @PathVariable final String stakeholderId);
+    ResponseEntity<Optional<String>> revokeMembership(@Valid @PathVariable final String stakeholderId);
 }

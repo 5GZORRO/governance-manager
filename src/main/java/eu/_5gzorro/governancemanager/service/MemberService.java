@@ -8,6 +8,8 @@ import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface MemberService {
 
     /**
@@ -20,7 +22,6 @@ public interface MemberService {
 
     Page<MemberDto> getMembers(Pageable pageable, String filterText);
     MembershipStatusDto getMemberStatus(String id);
-    void processMembershipRevocationRequest(String requestingStakeholderId, String subjectId);
-    void revokeMembership(String subjectId);
-    void revokeMembership(Member member);
+    //void processMembershipRevocationRequest(String requestingStakeholderId, String subjectId);
+    Optional<String> revokeMembership(String requestingStakeholderId, String subjectId);
 }
