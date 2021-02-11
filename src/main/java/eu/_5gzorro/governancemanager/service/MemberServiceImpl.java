@@ -76,41 +76,46 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void processMembershipRevocationRequest(String requestingStakeholderId, String subjectId) {
+    public Optional<String> revokeMembership(String requestingStakeholderId, String subjectId) {
 
         Member member = memberRepository.findById(subjectId)
                 .orElseThrow(() -> new MemberNotFoundException(subjectId));
 
-        if(requestingStakeholderId.equals(subjectId)) {
-            revokeMembership(member);
-            return;
-        }
-
-        GovernanceProposal proposal = new GovernanceProposal();
-        proposal.setProposerId(requestingStakeholderId);
-        proposal.setActionType(GovernanceActionType.REVOKE_STAKEHOLDER_MEMBERSHIP);
-        proposal.setSubjectId(subjectId);
-
-        governanceProposalService.processGovernanceProposal(proposal);
-    }
-
-    @Override
-    @Transactional
-    public void revokeMembership(String subjectId) {
-        Member member = memberRepository.findById(subjectId)
-                .orElseThrow(() -> new MemberNotFoundException(subjectId));
-
-        revokeMembership(member);
-    }
-
-    @Override
-    @Transactional
-    public void revokeMembership(Member member) {
+        if(member.getStatus() == MembershipStatus.REVOKED)
+            return Optional.empty(); //ignore request if already revoked
 
         if(member.getStatus() != MembershipStatus.ACTIVE) {
             throw new MemberStatusException(MembershipStatus.ACTIVE, member.getStatus());
         }
 
+        // If revoking own membership, no governance process needed
+        if(requestingStakeholderId.equals(subjectId)) {
+            revokeMembership(member);
+            return Optional.empty();
+        }
+
+        /**
+         * For all other scenarios we need to create a governance proposal
+         */
+        GovernanceProposal proposal = new GovernanceProposal();
+        proposal.setProposerId(requestingStakeholderId);
+        proposal.setActionType(GovernanceActionType.REVOKE_STAKEHOLDER_MEMBERSHIP);
+        proposal.setSubjectId(subjectId);
+
+        String proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
+        return Optional.of(proposalIdentifier);
+    }
+
+//    @Override
+//    @Transactional
+//    public void revokeMembership(String subjectId) {
+//        Member member = memberRepository.findById(subjectId)
+//                .orElseThrow(() -> new MemberNotFoundException(subjectId));
+//
+//        revokeMembership(member);
+//    }
+
+    private void revokeMembership(Member member) {
         member.setStatus(MembershipStatus.REVOKED);
         member.setUpdated(LocalDateTime.now());
         memberRepository.save(member);

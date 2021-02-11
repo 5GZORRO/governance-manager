@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 public class MembershipsControllerImpl implements MembershipsController {
@@ -58,10 +59,10 @@ public class MembershipsControllerImpl implements MembershipsController {
         //TODO: Obtain requesting stakeholder id from Auth token
         final String requestingStakeholderId = "123";
 
-        memberService.processMembershipRevocationRequest(requestingStakeholderId, stakeholderId);
+        Optional<String> proposalIdentifier = memberService.revokeMembership(requestingStakeholderId, stakeholderId);
 
         return ResponseEntity
                 .ok()
-                .build();
+                .body(proposalIdentifier);
     }
 }

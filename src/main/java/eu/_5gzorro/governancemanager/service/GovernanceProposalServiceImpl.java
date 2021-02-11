@@ -1,24 +1,15 @@
 package eu._5gzorro.governancemanager.service;
 
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
-import eu._5gzorro.governancemanager.dto.MemberDto;
-import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
-import eu._5gzorro.governancemanager.model.entity.Member;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
-import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalStatusException;
 import eu._5gzorro.governancemanager.model.exception.InvalidGovernanceActionException;
-import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.model.mapper.GovernanceProposalMapper;
-import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
-import eu._5gzorro.governancemanager.model.mapper.MemberNotificationSettingsMapper;
 import eu._5gzorro.governancemanager.repository.GovernanceProposalRepository;
-import eu._5gzorro.governancemanager.repository.MemberRepository;
 import eu._5gzorro.governancemanager.repository.specifications.GovernanceProposalSpecs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,10 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class GovernanceProposalServiceImpl implements GovernanceProposalService {
@@ -70,10 +58,9 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
         List<GovernanceProposal> existingProposals = governanceProposalRepository.findBySubjectIdAndActionTypeAndStatusIn(proposal.getSubjectId(), proposal.getActionType(), List.of(GovernanceProposalStatus.PROPOSED));
 
-        if(existingProposals.size() > 0) {
+        if(!existingProposals.isEmpty()) {
             throw new IllegalStateException("A proposal of this nature is already being processed for this subject.");
         }
-
 
         // TODO: Generate a DID for the proposal
         String proposalIdentifier = "DID";
@@ -150,6 +137,6 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         governanceProposalRepository.save(proposal);
 
         // TODO: emit event for subscribing entities to deal with
-        //  e.g. MembersService to update member status when on-boarding decision has been reached
+        //  e.g. MembersService to update member status when on-boarding/revocation decision has been reached
     }
 }
