@@ -11,9 +11,10 @@ import eu._5gzorro.governancemanager.model.enumeration.NotificationSetting;
 import eu._5gzorro.governancemanager.model.enumeration.NotificationType;
 import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.repository.MemberRepository;
+import eu._5gzorro.governancemanager.service.GovernanceProposalService;
+import eu._5gzorro.governancemanager.service.GovernanceProposalServiceImpl;
 import eu._5gzorro.governancemanager.service.MemberService;
 import eu._5gzorro.governancemanager.service.MemberServiceImpl;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -29,13 +30,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.mockito.ArgumentMatchers;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -64,6 +64,9 @@ public class MemberServiceImplUnitTest {
     private MemberService memberService;
 
     @MockBean
+    GovernanceProposalService governanceProposalService;
+
+    @MockBean
     private MemberRepository memberRepository;
 
     @Test
@@ -84,8 +87,8 @@ public class MemberServiceImplUnitTest {
         Page<MemberDto> result = memberService.getMembers(page, nameFilter);
 
         // then
-        assertEquals(result.getContent().size(), 1);
-        assertEquals(result.getContent().get(0), expectedMemberDto);
+        assertEquals(1, result.getContent().size());
+        assertEquals(expectedMemberDto, result.getContent().get(0));
     }
 
     @Test
@@ -116,7 +119,7 @@ public class MemberServiceImplUnitTest {
 
         // then
         verify(memberRepository, times(1)).save(expectedMember);
-        assertEquals(result, "PROPOSAL DID");
+        assertEquals("PROPOSAL DID", result);
     }
 
     @Test
@@ -138,7 +141,7 @@ public class MemberServiceImplUnitTest {
 
         // then
         verify(memberRepository, times(1)).findById(stakeholderId);
-        assertEquals(result, expectedMember);
+        assertEquals(expectedMember, result);
     }
 
     @Test

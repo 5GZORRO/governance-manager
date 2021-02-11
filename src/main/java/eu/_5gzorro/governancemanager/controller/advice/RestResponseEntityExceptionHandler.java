@@ -2,8 +2,7 @@ package eu._5gzorro.governancemanager.controller.advice;
 
 
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
-import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
-import io.swagger.v3.oas.models.responses.ApiResponse;
+import eu._5gzorro.governancemanager.model.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +25,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(value= { IllegalArgumentException.class, IllegalStateException.class })
     protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
 
-        ApiErrorResponse responseBody = new ApiErrorResponse(HttpStatus.CONFLICT.value(), "");
+        ApiErrorResponse responseBody = new ApiErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
 
         return handleExceptionInternal(ex, responseBody,
                 new HttpHeaders(), HttpStatus.CONFLICT, request);
@@ -58,11 +56,21 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return super.handleExceptionInternal(ex, response, headers, status, request);
     }
 
-    @ExceptionHandler({ MemberNotFoundException.class })
+    @ExceptionHandler({ MemberNotFoundException.class, GovernanceProposalNotFoundException.class })
     @ResponseStatus(value=HttpStatus.NOT_FOUND)
     @ResponseBody
     protected ApiErrorResponse handleEntityNofFoundException(HttpServletRequest req, Exception ex) {
-        ApiErrorResponse response = new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        return response;
+        return new ApiErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler({
+            MemberStatusException.class,
+            GovernanceProposalStatusException.class,
+            InvalidGovernanceActionException.class
+    })
+    @ResponseStatus(value=HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    protected ApiErrorResponse handleInvalidRequests(HttpServletRequest req, Exception ex) {
+        return new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 }

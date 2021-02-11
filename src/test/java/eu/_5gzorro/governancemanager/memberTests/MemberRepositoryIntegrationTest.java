@@ -54,8 +54,8 @@ public class MemberRepositoryIntegrationTest {
         Page<Member> found = memberRepository.findByLegalNameContainingIgnoreCase(nameFilter, page);
 
         // then
-        assertEquals(found.getTotalElements(), 1);
-        assertEquals(found.getContent().get(0), telefonica);
+        assertEquals(1, found.getTotalElements());
+        assertEquals(telefonica, found.getContent().get(0));
     }
 
     @Test
@@ -87,6 +87,6 @@ public class MemberRepositoryIntegrationTest {
         Page<Member> found = memberRepository.findByLegalNameContainingIgnoreCase(nameFilter, page);
 
         // then
-        assertEquals(found.getTotalElements(), 0);
+        assertEquals(0, found.getTotalElements());
     }
 }
