@@ -1,14 +1,21 @@
 package eu._5gzorro.governancemanager.service;
 
+import eu._5gzorro.governancemanager.GovernanceManagerApplication;
 import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
+import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
+import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
+import eu._5gzorro.governancemanager.model.mapper.GovernanceProposalMapper;
 import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
 import eu._5gzorro.governancemanager.model.mapper.MemberNotificationSettingsMapper;
 import eu._5gzorro.governancemanager.model.entity.Member;
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.repository.MemberRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,8 +29,13 @@ import java.util.Optional;
 @Service
 public class MemberServiceImpl implements MemberService {
 
+    private static final Logger log = LogManager.getLogger(MemberServiceImpl.class);
+
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private GovernanceProposalService governanceProposalService;
 
     @Autowired
     private ModelMapper mapper;
@@ -32,17 +44,19 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public String processMembershipApplication(NewMembershipRequest request) {
 
-        // TODO: Load DID doc for address & legal name
+        // TODO: Load DID doc or VC for address & legal name
+        String legalName = request.getLegalName();  //get from request for now (should be from DD/VC)
+        String address = "";
 
-        Member member = new Member(request.getStakeholderId(), request.getLegalName());
-        member.setAddress("");
-        member.setStatus(MembershipStatus.PENDING);
+        Member member = new Member(request.getStakeholderId(), legalName);
+        member.setAddress(address);
         member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getNotificationMethod()));
         memberRepository.save(member);
 
-        //TODO: CREATE GOVERNANCE PROPOSAL
+        GovernanceProposal proposal = GovernanceProposalMapper.fromNewMembershipRequest(request);
+        String proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
 
-        return "PROPOSAL DID";
+        return proposalIdentifier;
     }
 
     @Override
@@ -54,12 +68,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MembershipStatusDto getMemberStatus(String id) {
-        Optional<Member> member =  memberRepository.findById(id);
+        Member member =  memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException(id));
 
-        if(member.isEmpty())
-            throw new MemberNotFoundException(id);
-
-        return MemberMapper.toMembershipStatusDto(member.get());
+        return MemberMapper.toMembershipStatusDto(member);
     }
 
     @Override
@@ -74,7 +86,12 @@ public class MemberServiceImpl implements MemberService {
             return;
         }
 
-        // TODO: Create governance proposal
+        GovernanceProposal proposal = new GovernanceProposal();
+        proposal.setProposerId(requestingStakeholderId);
+        proposal.setActionType(GovernanceActionType.REVOKE_STAKEHOLDER_MEMBERSHIP);
+        proposal.setSubjectId(subjectId);
+
+        governanceProposalService.processGovernanceProposal(proposal);
     }
 
     @Override
@@ -89,6 +106,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void revokeMembership(Member member) {
+
+        if(member.getStatus() != MembershipStatus.ACTIVE) {
+            throw new MemberStatusException(MembershipStatus.ACTIVE, member.getStatus());
+        }
+
         member.setStatus(MembershipStatus.REVOKED);
         member.setUpdated(LocalDateTime.now());
         memberRepository.save(member);

@@ -4,6 +4,7 @@ import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembers
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import eu._5gzorro.governancemanager.model.entity.Member;
+import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

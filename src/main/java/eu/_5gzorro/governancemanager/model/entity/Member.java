@@ -23,7 +23,7 @@ public class Member {
     private String address;
 
     @Column(name="status", nullable = false)
-    private MembershipStatus status;
+    private MembershipStatus status = MembershipStatus.PENDING;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberNotificationSetting> notificationSettings = new HashSet<>();

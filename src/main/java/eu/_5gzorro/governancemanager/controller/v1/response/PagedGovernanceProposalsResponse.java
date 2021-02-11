@@ -6,17 +6,14 @@ import org.springframework.data.domain.Page;
 import java.util.Objects;
 
 public class PagedGovernanceProposalsResponse {
-    private Page<GovernanceProposalDto> pagedGovernanceProposals;
+    private final Page<GovernanceProposalDto> pagedGovernanceProposals;
 
-    public PagedGovernanceProposalsResponse() {
+    public PagedGovernanceProposalsResponse(Page<GovernanceProposalDto> pagedGovernanceProposals) {
+        this.pagedGovernanceProposals = pagedGovernanceProposals;
     }
 
     public Page<GovernanceProposalDto> getPagedGovernanceProposals() {
         return pagedGovernanceProposals;
-    }
-
-    public void setPagedGovernanceProposals(Page<GovernanceProposalDto> pagedGovernanceProposals) {
-        this.pagedGovernanceProposals = pagedGovernanceProposals;
     }
 
     @Override

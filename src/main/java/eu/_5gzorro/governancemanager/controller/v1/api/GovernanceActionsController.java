@@ -6,7 +6,7 @@ import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.PageableOperation;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
-import eu._5gzorro.governancemanager.model.enumeration.ProposalStatus;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,8 +49,8 @@ public interface GovernanceActionsController {
     @PageableOperation
     ResponseEntity<PagedGovernanceProposalsResponse> getProposals(
             final @Parameter(hidden = true) Pageable pageable,
-            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of proposalStatus' to filter the response by") final Optional<List<ProposalStatus>> statusFilter,
-            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of actionTypes to filter the response by") final Optional<List<GovernanceActionType>> actionTypeFilter);
+            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of proposalStatus' to filter the response by") final List<GovernanceProposalStatus> statusFilter,
+            @RequestParam(required = false) @Parameter(description = "Optional comma separated list of actionTypes to filter the response by") final List<GovernanceActionType> actionTypeFilter);
 
 
     @Operation(description = "Retrieve a 5GZORRO governance proposal including current status information", tags= { "Governance - All Stakeholders" })
@@ -63,7 +63,7 @@ public interface GovernanceActionsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("{proposalId}")
-    ResponseEntity<GovernanceProposalDto> getGovernanceDecision(@Valid @PathVariable final String proposalId);
+    ResponseEntity<GovernanceProposalDto> getGovernanceProposal(@Valid @PathVariable final String proposalId);
 
     @Operation(description = "Vote on a 5GZORRO governance proposal", tags= { "Governance - Admin Only" })
     @ApiResponses(value = {

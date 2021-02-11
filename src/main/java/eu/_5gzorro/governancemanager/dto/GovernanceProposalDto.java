@@ -1,14 +1,14 @@
 package eu._5gzorro.governancemanager.dto;
 
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
-import eu._5gzorro.governancemanager.model.enumeration.ProposalStatus;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class GovernanceProposalDto {
     private String proposalId;
-    private ProposalStatus status;
+    private GovernanceProposalStatus status;
     private GovernanceActionType actionType;
     private ActionParamsDto actionParams;
     private LocalDateTime statusUpdated;
@@ -24,11 +24,11 @@ public class GovernanceProposalDto {
         this.proposalId = proposalId;
     }
 
-    public ProposalStatus getStatus() {
+    public GovernanceProposalStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ProposalStatus status) {
+    public void setStatus(GovernanceProposalStatus status) {
         this.status = status;
     }
 
