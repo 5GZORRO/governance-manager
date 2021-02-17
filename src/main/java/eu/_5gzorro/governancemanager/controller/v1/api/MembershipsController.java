@@ -58,13 +58,13 @@ public interface MembershipsController {
     @GetMapping
     @PageableOperation
     ResponseEntity<PagedMembersResponse> getMembers(
-            @RequestParam(required = false) final @Parameter(hidden = true) Pageable pageable,
-            @RequestParam(required = false) @Parameter(description = "String to filter members by name containing this text") final Optional<String> filterText);
+            final @Parameter(hidden = true) Pageable pageable,
+            @RequestParam(required = false, defaultValue = "") @Parameter(description = "String to filter members by name containing this text") final String filterText);
 
 
     @Operation(description = "Request to revoke 5GZORRO stakeholder membership with a given stakeholder Id.  Decision to uphold the request is subject to governance if the request is not for the requesting stakeholder")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Request was submitted successfully",
+            @ApiResponse(responseCode = "200", description = "Request was submitted successfully. If requesting revocation for another stakeholder the Id of the associated governance proposal will be returned",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "The request failed validation checks",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -72,5 +72,5 @@ public interface MembershipsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @DeleteMapping("{stakeholderId}/revoke-membership")
-    ResponseEntity revokeMembership(@Valid @PathVariable final String stakeholderId);
+    ResponseEntity<Optional<String>> revokeMembership(@Valid @PathVariable final String stakeholderId);
 }

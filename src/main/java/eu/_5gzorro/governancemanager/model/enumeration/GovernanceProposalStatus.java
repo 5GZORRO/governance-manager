@@ -1,6 +1,6 @@
 package eu._5gzorro.governancemanager.model.enumeration;
 
-public enum ProposalStatus {
+public enum GovernanceProposalStatus {
     PROPOSED,
     APPROVED,
     REJECTED

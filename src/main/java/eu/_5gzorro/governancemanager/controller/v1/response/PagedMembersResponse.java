@@ -6,17 +6,14 @@ import org.springframework.data.domain.Page;
 import java.util.Objects;
 
 public class PagedMembersResponse {
-    private Page<MemberDto> pagedMembers;
+    private final Page<MemberDto> pagedMembers;
 
-    public PagedMembersResponse() {
+    public PagedMembersResponse(Page<MemberDto> pagedMembers) {
+        this.pagedMembers = pagedMembers;
     }
 
     public Page<MemberDto> getPagedMembers() {
         return pagedMembers;
-    }
-
-    public void setPagedMembers(Page<MemberDto> pagedMembers) {
-        this.pagedMembers = pagedMembers;
     }
 
     @Override

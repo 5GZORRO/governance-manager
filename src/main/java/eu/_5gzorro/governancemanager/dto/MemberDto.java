@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class MemberDto {
 
-    private String stakeholderId;
+    private String id;
     private String legalName;
     private String address;
 
@@ -12,11 +12,11 @@ public class MemberDto {
     }
 
     public String getStakeholderId() {
-        return stakeholderId;
+        return id;
     }
 
     public void setStakeholderId(String stakeholderId) {
-        this.stakeholderId = stakeholderId;
+        this.id = stakeholderId;
     }
 
     public String getLegalName() {
@@ -40,18 +40,18 @@ public class MemberDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MemberDto memberDto = (MemberDto) o;
-        return stakeholderId.equals(memberDto.stakeholderId) && legalName.equals(memberDto.legalName);
+        return id.equals(memberDto.id) && legalName.equals(memberDto.legalName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(stakeholderId, legalName);
+        return Objects.hash(id, legalName);
     }
 
     @Override
     public String toString() {
         return "MemberDto{" +
-                "stakeholderId='" + stakeholderId + '\'' +
+                "id='" + id + '\'' +
                 ", legalName='" + legalName + '\'' +
                 ", address='" + address + '\'' +
                 '}';

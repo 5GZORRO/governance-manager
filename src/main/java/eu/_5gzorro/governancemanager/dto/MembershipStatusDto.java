@@ -42,12 +42,12 @@ public class MembershipStatusDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MembershipStatusDto that = (MembershipStatusDto) o;
-        return stakeholderId.equals(that.stakeholderId) && status == that.status && statusUpdated.equals(that.statusUpdated);
+        return stakeholderId.equals(that.stakeholderId) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(stakeholderId, status, statusUpdated);
+        return Objects.hash(stakeholderId, status);
     }
 
     @Override
