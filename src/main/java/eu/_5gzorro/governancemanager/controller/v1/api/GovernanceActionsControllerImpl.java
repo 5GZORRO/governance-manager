@@ -3,6 +3,7 @@ package eu._5gzorro.governancemanager.controller.v1.api;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.service.GovernanceProposalService;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class GovernanceActionsControllerImpl implements GovernanceActionsController {
@@ -26,11 +26,13 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     @Autowired
     private GovernanceProposalService governanceProposalService;
 
+    @Autowired
+    private AuthData authData;
+
     @Override
     public ResponseEntity<String> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
 
-        // TODO: Obtain requester's id from auth token
-        String requestingStakeholderId = "RequestersId";
+        String requestingStakeholderId = authData.getUserId();
 
         String proposalIdentifier = governanceProposalService.processGovernanceProposal(requestingStakeholderId, request);
 
@@ -62,8 +64,7 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     @Override
     public ResponseEntity voteGovernanceDecision(@Valid String proposalId, @Valid boolean accept) {
 
-        // TODO: Obtain requester's id from auth token
-        String votingStakeholderId = "VotersId";
+        String votingStakeholderId = authData.getUserId();
 
         governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, proposalId, accept);
 

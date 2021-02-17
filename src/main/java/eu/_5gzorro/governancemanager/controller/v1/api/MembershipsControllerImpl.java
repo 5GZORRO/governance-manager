@@ -4,6 +4,7 @@ import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembers
 import eu._5gzorro.governancemanager.controller.v1.response.PagedMembersResponse;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
+import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.service.MemberService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,9 @@ public class MembershipsControllerImpl implements MembershipsController {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private AuthData authData;
 
     @Override
     public ResponseEntity<String> applyForMembership(@Valid NewMembershipRequest request) {
@@ -56,8 +60,7 @@ public class MembershipsControllerImpl implements MembershipsController {
     @Override
     public ResponseEntity revokeMembership(@Valid String stakeholderId) {
 
-        //TODO: Obtain requesting stakeholder id from Auth token
-        final String requestingStakeholderId = "123";
+        final String requestingStakeholderId = authData.getUserId();
 
         Optional<String> proposalIdentifier = memberService.revokeMembership(requestingStakeholderId, stakeholderId);
 

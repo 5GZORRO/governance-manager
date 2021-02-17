@@ -1,5 +1,6 @@
 package eu._5gzorro.governancemanager.memberTests;
 
+import eu._5gzorro.governancemanager.config.Config;
 import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.dto.EmailNotificationDto;
 import eu._5gzorro.governancemanager.dto.MemberDto;
@@ -44,20 +45,10 @@ import static org.mockito.Mockito.*;
 class MemberServiceImplUnitTest {
 
     @TestConfiguration
-    static class MemberServiceImplUnitTestContextConfiguration {
+    static class MemberServiceImplUnitTestContextConfiguration extends Config {
         @Bean
         public MemberService memberService() {
             return new MemberServiceImpl();
-        }
-
-        @Bean
-        public ModelMapper mapper() {
-            ModelMapper modelMapper = new ModelMapper();
-            modelMapper.getConfiguration()
-                    .setFieldMatchingEnabled(true)
-                    .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
-                    .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR);
-            return modelMapper;
         }
     }
 
