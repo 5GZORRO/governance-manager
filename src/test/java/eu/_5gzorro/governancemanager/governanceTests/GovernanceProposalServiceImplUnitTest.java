@@ -1,5 +1,6 @@
 package eu._5gzorro.governancemanager.governanceTests;
 
+import eu._5gzorro.governancemanager.config.Config;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.dto.*;
@@ -45,20 +46,10 @@ import static org.mockito.Mockito.*;
 public class GovernanceProposalServiceImplUnitTest {
 
     @TestConfiguration
-    static class GovernanceProposalServiceImplUnitTestContextConfiguration {
+    static class GovernanceProposalServiceImplUnitTestContextConfiguration extends Config {
         @Bean
         public GovernanceProposalService governanceProposalService() {
             return new GovernanceProposalServiceImpl();
-        }
-
-        @Bean
-        public ModelMapper mapper() {
-            ModelMapper modelMapper = new ModelMapper();
-            modelMapper.getConfiguration()
-                    .setFieldMatchingEnabled(true)
-                    .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
-                    .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR);
-            return modelMapper;
         }
     }
 
