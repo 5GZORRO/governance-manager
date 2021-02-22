@@ -8,5 +8,3 @@ spring:
     driverClassName: org.h2.Driver
     username: 5gzorro_admin
     password: 5gzorro
-
-
