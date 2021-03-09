@@ -7,9 +7,11 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name="member", indexes = {
+        @Index(name="ix_handle", unique = true, columnList = "handle"),
         @Index(name = "ix_name", columnList = "legal_name"),
 })
 public class Member {
@@ -17,13 +19,16 @@ public class Member {
     @Id
     private String id;
 
+    @Column(name="handle", nullable = false)
+    private UUID handle;
+
     @Column(name="legal_name", nullable = false, unique = true)
     private String legalName;
 
     private String address;
 
     @Column(name="status", nullable = false)
-    private MembershipStatus status = MembershipStatus.PENDING;
+    private MembershipStatus status = MembershipStatus.CREATING;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberNotificationSetting> notificationSettings = new HashSet<>();
@@ -47,6 +52,14 @@ public class Member {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public UUID getHandle() {
+        return handle;
+    }
+
+    public void setHandle(UUID handle) {
+        this.handle = handle;
     }
 
     public String getLegalName() {

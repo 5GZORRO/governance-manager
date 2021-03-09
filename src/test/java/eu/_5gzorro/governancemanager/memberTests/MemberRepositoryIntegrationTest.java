@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,12 +30,15 @@ public class MemberRepositoryIntegrationTest {
     public void whenFindByLegalName_thenReturnMatchingMembers() {
         Member bt = new Member("1", "BT");
         bt.setStatus(MembershipStatus.PENDING);
+        bt.setHandle(UUID.randomUUID());
 
         Member telefonica = new Member("2", "Telefonica");
         telefonica.setStatus(MembershipStatus.PENDING);
+        telefonica.setHandle(UUID.randomUUID());
 
         Member orange = new Member("3", "Orange");
         orange.setStatus(MembershipStatus.PENDING);
+        orange.setHandle(UUID.randomUUID());
 
         // given
         List<Member> members = new ArrayList<Member>() {
@@ -61,12 +65,15 @@ public class MemberRepositoryIntegrationTest {
     @Test
     public void whenFindByLegalNameDoesntMatchAny_thenReturnNoMembers() {
         Member bt = new Member("1", "BT");
+        bt.setHandle(UUID.randomUUID());
         bt.setStatus(MembershipStatus.PENDING);
 
         Member telefonica = new Member("2", "Telefonica");
+        telefonica.setHandle(UUID.randomUUID());
         telefonica.setStatus(MembershipStatus.PENDING);
 
         Member orange = new Member("3", "Orange");
+        orange.setHandle(UUID.randomUUID());
         orange.setStatus(MembershipStatus.PENDING);
 
         // given

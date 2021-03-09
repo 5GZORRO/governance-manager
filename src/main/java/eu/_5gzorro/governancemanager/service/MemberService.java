@@ -1,14 +1,14 @@
 package eu._5gzorro.governancemanager.service;
 
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
-import eu._5gzorro.governancemanager.model.entity.Member;
-import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MemberService {
 
@@ -16,12 +16,18 @@ public interface MemberService {
      * Process a membership application request. Creates a member record and generates a governance
      * proposal that is subsequently voted on.
      * @param request
-     * @return The DID of the resulting proposal
+     * @return The UUID Handle of the resulting proposal
      */
-    String processMembershipApplication(NewMembershipRequest request);
+    UUID processMembershipApplication(RegisterRequest request);
 
     Page<MemberDto> getMembers(Pageable pageable, String filterText);
     MembershipStatusDto getMemberStatus(String id);
-    //void processMembershipRevocationRequest(String requestingStakeholderId, String subjectId);
-    Optional<String> revokeMembership(String requestingStakeholderId, String subjectId);
+    Optional<UUID> revokeMembership(String requestingStakeholderId, String subjectId);
+
+    /**
+     * Replace temporary handle with issued DID
+     * @param memberHandle
+     * @param state
+     */
+    void updateMemberIdentity(UUID memberHandle, DIDStateDto state);
 }

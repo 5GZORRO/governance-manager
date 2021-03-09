@@ -2,6 +2,7 @@ package eu._5gzorro.governancemanager.controller.v1.api;
 
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class GovernanceActionsControllerImpl implements GovernanceActionsController {
@@ -30,11 +32,11 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     private AuthData authData;
 
     @Override
-    public ResponseEntity<String> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
+    public ResponseEntity<UUID> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
 
         String requestingStakeholderId = authData.getUserId();
 
-        String proposalIdentifier = governanceProposalService.processGovernanceProposal(requestingStakeholderId, request);
+        UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(requestingStakeholderId, request);
 
         return ResponseEntity
                 .ok()
@@ -71,5 +73,11 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
         return ResponseEntity
                 .ok()
                 .build();
+    }
+
+    @Override
+    public ResponseEntity updateProposalIdentity(@Valid UUID proposalHandle, @Valid DIDStateDto state) {
+        governanceProposalService.updateGovernanceProposalIdentity(proposalHandle, state);
+        return ResponseEntity.ok().build();
     }
 }

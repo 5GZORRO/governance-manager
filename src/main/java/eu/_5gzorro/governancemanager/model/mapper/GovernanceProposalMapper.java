@@ -1,7 +1,7 @@
 package eu._5gzorro.governancemanager.model.mapper;
 
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
 import eu._5gzorro.governancemanager.dto.ActionParamsDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
@@ -35,7 +35,7 @@ public class GovernanceProposalMapper {
         return proposal;
     }
 
-    public static GovernanceProposal fromNewMembershipRequest(NewMembershipRequest request) {
+    public static GovernanceProposal fromNewMembershipRequest(RegisterRequest request) {
 
         GovernanceProposal proposal = new GovernanceProposal();
         proposal.setProposerId(request.getStakeholderId());

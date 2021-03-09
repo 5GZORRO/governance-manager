@@ -9,6 +9,7 @@ import java.util.Objects;
 @RequestScope
 public class AuthData {
     private String userId = "AuthenticatedUserId"; // TODO: Extract from auth header/token in auth filter and set
+    private String authToken = "Token";
 
     public String getUserId() {
         return userId;
@@ -16,6 +17,14 @@ public class AuthData {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     @Override

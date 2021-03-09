@@ -6,15 +6,20 @@ import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "governance_proposal", indexes = {
+        @Index(name = "ix_handle", unique = true, columnList = "handle"),
         @Index(name = "ix_actionType_status", unique = false, columnList = "action_type,status")
 })
 public class GovernanceProposal {
 
     @Id
     private String id;
+
+    @Column(name="handle", nullable = false)
+    private UUID handle;
 
     @Column(name = "proposer_id", nullable = false)
     private String proposerId;
@@ -23,7 +28,7 @@ public class GovernanceProposal {
     private String subjectId;
 
     @Column(name = "status", nullable = false)
-    private GovernanceProposalStatus status = GovernanceProposalStatus.PROPOSED;
+    private GovernanceProposalStatus status = GovernanceProposalStatus.CREATING;
 
     @Column(name = "action_type", nullable = false)
     private GovernanceActionType actionType;
@@ -46,6 +51,14 @@ public class GovernanceProposal {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public UUID getHandle() {
+        return handle;
+    }
+
+    public void setHandle(UUID handle) {
+        this.handle = handle;
     }
 
     public String getProposerId() {
@@ -108,19 +121,20 @@ public class GovernanceProposal {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GovernanceProposal that = (GovernanceProposal) o;
-        return id.equals(that.id) && proposerId.equals(that.proposerId) && subjectId.equals(that.subjectId) && status == that.status && actionType == that.actionType;
+        GovernanceProposal proposal = (GovernanceProposal) o;
+        return id.equals(proposal.id) && handle.equals(proposal.handle) && proposerId.equals(proposal.proposerId) && subjectId.equals(proposal.subjectId) && status == proposal.status && actionType == proposal.actionType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, proposerId, subjectId, status, actionType);
+        return Objects.hash(id, handle, proposerId, subjectId, status, actionType);
     }
 
     @Override
     public String toString() {
         return "GovernanceProposal{" +
                 "id='" + id + '\'' +
+                ", handle=" + handle +
                 ", proposerId='" + proposerId + '\'' +
                 ", subjectId='" + subjectId + '\'' +
                 ", status=" + status +
