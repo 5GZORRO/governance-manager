@@ -1,8 +1,9 @@
 package eu._5gzorro.governancemanager.service;
 
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.httpClient.CredentialClient;
 import eu._5gzorro.governancemanager.httpClient.DIDClient;
-import eu._5gzorro.governancemanager.httpClient.request.IssueCredentialRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,12 @@ public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissio
     }
 
     @Override
+    public void issueStakeholderCredential(RegisterStakeholderRequest request) {
+        credentialClient.issueStakeholderCredential(request.getId(), request);
+    }
+
+    @Override
     public void issueCredential(IssueCredentialRequest request) {
-        credentialClient.issue(request);
+        credentialClient.issueCredential(request.getRequestId(), request);
     }
 }

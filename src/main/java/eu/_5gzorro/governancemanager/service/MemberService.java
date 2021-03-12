@@ -1,6 +1,7 @@
 package eu._5gzorro.governancemanager.service;
 
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
@@ -18,16 +19,9 @@ public interface MemberService {
      * @param request
      * @return The UUID Handle of the resulting proposal
      */
-    UUID processMembershipApplication(RegisterRequest request);
+    UUID processMembershipApplication(RegisterStakeholderRequest request) throws JsonProcessingException;
 
     Page<MemberDto> getMembers(Pageable pageable, String filterText);
     MembershipStatusDto getMemberStatus(String id);
     Optional<UUID> revokeMembership(String requestingStakeholderId, String subjectId);
-
-    /**
-     * Replace temporary handle with issued DID
-     * @param memberHandle
-     * @param state
-     */
-    void updateMemberIdentity(UUID memberHandle, DIDStateDto state);
 }

@@ -1,17 +1,16 @@
 package eu._5gzorro.governancemanager.model.entity;
 
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name="member", indexes = {
-        @Index(name="ix_handle", unique = true, columnList = "handle"),
         @Index(name = "ix_name", columnList = "legal_name"),
 })
 public class Member {
@@ -19,19 +18,21 @@ public class Member {
     @Id
     private String id;
 
-    @Column(name="handle", nullable = false)
-    private UUID handle;
-
     @Column(name="legal_name", nullable = false, unique = true)
     private String legalName;
 
     private String address;
 
     @Column(name="status", nullable = false)
-    private MembershipStatus status = MembershipStatus.CREATING;
+    private MembershipStatus status = MembershipStatus.PENDING;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberNotificationSetting> notificationSettings = new HashSet<>();
+
+    @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name="membership_request")
+    private byte[] membershipRequest;
 
     @Column(nullable = false)
     private LocalDateTime created = LocalDateTime.now();
@@ -52,14 +53,6 @@ public class Member {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public UUID getHandle() {
-        return handle;
-    }
-
-    public void setHandle(UUID handle) {
-        this.handle = handle;
     }
 
     public String getLegalName() {
@@ -88,6 +81,14 @@ public class Member {
 
     public Set<MemberNotificationSetting> getNotificationSettings() {
         return notificationSettings;
+    }
+
+    public byte[] getMembershipRequest() {
+        return membershipRequest;
+    }
+
+    public void setMembershipRequest(byte[] membershipRequest) {
+        this.membershipRequest = membershipRequest;
     }
 
     public void addNotificationSetting(MemberNotificationSetting setting) {

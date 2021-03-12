@@ -61,9 +61,9 @@ public class MembershipsControllerImpl implements MembershipsController {
                 .body(proposalIdentifier);
     }
 
-    @Override
-    public ResponseEntity updateMemberIdentity(@Valid UUID memberHandle, @Valid DIDStateDto state) {
-        memberService.updateMemberIdentity(memberHandle, state);
-        return ResponseEntity.ok().build();
-    }
+//    @Override
+//    public ResponseEntity updateMemberIdentity(@Valid UUID memberHandle, @Valid DIDStateDto state) {
+//        memberService.updateMemberIdentity(memberHandle, state);
+//        return ResponseEntity.ok().build();
+//    }
 }

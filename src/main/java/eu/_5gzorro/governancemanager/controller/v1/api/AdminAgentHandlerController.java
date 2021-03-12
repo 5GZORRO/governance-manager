@@ -1,7 +1,8 @@
 package eu._5gzorro.governancemanager.controller.v1.api;
 
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueRequest;
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-@RequestMapping("/api/v1/memberships")
+@RequestMapping("/api/v1/admin-agent-handler")
 @Validated
-@Tag(name = "Stakeholder Membership")
+@Tag(name = "Admin Agent")
 public interface AdminAgentHandlerController {
 
     @Operation(description = "Request 5GZORRO stakeholder membership.  Request is subject to governance prior to approval.")
@@ -28,14 +29,14 @@ public interface AdminAgentHandlerController {
             @ApiResponse(responseCode = "400", description = "The request failed validation checks",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @PostMapping
-    ResponseEntity registerStakeholder(@Valid @RequestBody final RegisterRequest request);
+    @PostMapping("stakeholder/receive")
+    ResponseEntity registerStakeholder(@Valid @RequestBody final RegisterStakeholderRequest request) throws JsonProcessingException;
 
 
-    @PostMapping
-    ResponseEntity issue(@Valid @RequestBody final IssueRequest request);
+    @PostMapping("receive")
+    ResponseEntity issue(@Valid @RequestBody final IssueCredentialRequest request);
 
 
-    @DeleteMapping("{credentialId}")
+    @DeleteMapping("receive/{credentialId}")
     ResponseEntity revoke(@Valid @RequestParam final String credentialId);
 }

@@ -18,7 +18,3 @@ springdoc:
 logging:
   level:
     eu._5gzorro.governancemanager.httpClient: DEBUG
-
-integrations:
-  identity-permissions:
-    apiBaseUrl: ${IDENTITY_BASE_URL:'http://localhost:8888/path/tbc'}

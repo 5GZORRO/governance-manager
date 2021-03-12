@@ -1,13 +1,15 @@
 package eu._5gzorro.governancemanager.service;
 
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.enumeration.DIDStateEnum;
+import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
-import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
 import eu._5gzorro.governancemanager.model.mapper.GovernanceProposalMapper;
 import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
@@ -16,6 +18,7 @@ import eu._5gzorro.governancemanager.model.entity.Member;
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.repository.MemberRepository;
+import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
@@ -28,6 +31,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang.SerializationUtils;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -43,19 +47,49 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private ModelMapper mapper;
 
+    @Autowired
+    private AuthData authData;
+
+    @Autowired
+    private IdentityAndPermissionsApiClient identityAndPermissionsApiClient;
+
+    @Autowired
+    private UuidSource uuidSource;
+
+
     @Override
     @Transactional
-    public UUID processMembershipApplication(RegisterRequest request) {
+    public UUID processMembershipApplication(RegisterStakeholderRequest request) throws JsonProcessingException {
 
-        Member member = new Member(request.getStakeholderId(),  request.getLegalName());
-        member.setAddress(request.getAddress());
-        member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getNotificationMethod()));
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Member member = new Member(request.getStakeholderClaim().getDid(), request.getStakeholderClaim().getStakeholderProfile().getName());
+        member.setAddress(request.getStakeholderClaim().getStakeholderProfile().getAddress());
+        member.setMembershipRequest(objectMapper.writeValueAsBytes(request));
+
+        //TODO: reinstate when ID&P have implemented it
+        //member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getNotificationMethod()));
+
+        //TODO: Remove this when proposals reinstated
+        member.setStatus(MembershipStatus.ACTIVE);
+
         memberRepository.save(member);
 
-        GovernanceProposal proposal = GovernanceProposalMapper.fromNewMembershipRequest(request);
-        UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
+        // TODO: reinstate once we have completed intial simple integration or "immediately issue "
+//        GovernanceProposal proposal = GovernanceProposalMapper.fromNewMembershipRequest(authData.getUserId(), request);
+//        UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
+//        return proposalIdentifier;
 
-        return proposalIdentifier;
+        //TODO: Remove this once we start using proposal functionality
+        try {
+            identityAndPermissionsApiClient.issueStakeholderCredential(request);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return uuidSource.newUUID();  // return the proposal UUID here when reinstated
     }
 
     @Override
@@ -103,25 +137,6 @@ public class MemberServiceImpl implements MemberService {
 
         UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
         return Optional.of(proposalIdentifier);
-    }
-
-    @Override
-    @Transactional
-    public void updateMemberIdentity(UUID memberHandle, DIDStateDto state) {
-
-        if(state.getState() != DIDStateEnum.READY)
-            return;
-
-        Member member = memberRepository.findByHandle(memberHandle)
-                .orElseThrow(() -> new MemberNotFoundException(memberHandle.toString()));
-
-        if(member.getStatus() != MembershipStatus.CREATING)
-            throw new MemberStatusException(MembershipStatus.CREATING, member.getStatus());
-
-        member.setId(state.getDid());
-        member.setStatus(MembershipStatus.PENDING);
-        member.setUpdated(LocalDateTime.now());
-        memberRepository.save(member);
     }
 
     private void revokeMembership(Member member) {

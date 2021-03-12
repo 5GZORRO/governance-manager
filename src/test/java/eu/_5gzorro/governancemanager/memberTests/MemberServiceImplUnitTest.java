@@ -1,11 +1,14 @@
 package eu._5gzorro.governancemanager.memberTests;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import eu._5gzorro.governancemanager.config.Config;
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.dto.EmailNotificationDto;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.ClaimDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.StakeholderClaimDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.StakeholderProfileDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
 import eu._5gzorro.governancemanager.model.entity.Member;
@@ -36,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,6 +67,15 @@ class MemberServiceImplUnitTest {
     @MockBean
     private MemberRepository memberRepository;
 
+    @MockBean
+    private IdentityAndPermissionsApiClient identityAndPermissionsApiClient;
+
+    @MockBean
+    private UuidSource uuidSource;
+
+    @MockBean
+    private AuthData authData;
+
     @Test
     void whenFindByLegalNameMatches_thenReturnMatchingMemberDtos() {
         MemberDto expectedMemberDto = new MemberDto();
@@ -86,13 +99,12 @@ class MemberServiceImplUnitTest {
     }
 
     @Test
-    void processMembershipApplication_returnsProposalId() {
+    void processMembershipApplication_returnsProposalId() throws JsonProcessingException {
 
         UUID mockedProposalHandle = UUID.randomUUID();
         String mockedStakeholderDid = "did:5gzorro:1234567890";
         Member expectedMember = new Member(mockedStakeholderDid, "Telefonica");
-        expectedMember.setHandle(mockedProposalHandle);
-        expectedMember.setStatus(MembershipStatus.CREATING);
+        expectedMember.setStatus(MembershipStatus.PENDING);
 
         MemberNotificationSetting setting = new MemberNotificationSetting()
                 .notificationType(NotificationType.EMAIL)
@@ -102,16 +114,28 @@ class MemberServiceImplUnitTest {
         expectedMember.addNotificationSetting(setting);
 
         // given
-        RegisterRequest request = new RegisterRequest();
-        request.setLegalName("Telefonica");
-        request.setStakeholderId(mockedStakeholderDid);
-        request.setClaims(List.of(new ClaimDto()));
+        StakeholderProfileDto profile = new StakeholderProfileDto();
+        profile.setName("Telefonica");
+        profile.setAddress("10 the Street");
 
-        EmailNotificationDto notificationDto = new EmailNotificationDto();
-        notificationDto.setDistributionList(List.of("person@mail.com"));
-        request.setNotificationMethod(notificationDto);
+        StakeholderClaimDto claim = new StakeholderClaimDto();
+        claim.setDid(mockedStakeholderDid);
+        claim.setGovernanceBoardId("did:5gzorro:12345678901");
+        claim.setStakeholderProfile(profile);
+
+        RegisterStakeholderRequest request = new RegisterStakeholderRequest();
+        request.setStakeholderClaim(claim);
+
+        // TODO: reinstate when implemented on ID&P
+        //        EmailNotificationDto notificationDto = new EmailNotificationDto();
+        //        notificationDto.setDistributionList(List.of("person@mail.com"));
+        //        request.setNotificationMethod(notificationDto);
 
         // when
+
+        // TODO: Remove this when reinstating proposals
+        Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
+
         Mockito.when(governanceProposalService.processGovernanceProposal(any(GovernanceProposal.class))).thenReturn(mockedProposalHandle);
         UUID result = memberService.processMembershipApplication(request);
 
