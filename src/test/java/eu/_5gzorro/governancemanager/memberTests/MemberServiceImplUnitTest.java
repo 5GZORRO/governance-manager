@@ -114,9 +114,13 @@ class MemberServiceImplUnitTest {
         expectedMember.addNotificationSetting(setting);
 
         // given
+        EmailNotificationDto notificationDto = new EmailNotificationDto();
+        notificationDto.setDistributionList(List.of("person@mail.com"));
+
         StakeholderProfileDto profile = new StakeholderProfileDto();
         profile.setName("Telefonica");
         profile.setAddress("10 the Street");
+        profile.setNotificationMethod(notificationDto);
 
         StakeholderClaimDto claim = new StakeholderClaimDto();
         claim.setDid(mockedStakeholderDid);
@@ -126,13 +130,7 @@ class MemberServiceImplUnitTest {
         RegisterStakeholderRequest request = new RegisterStakeholderRequest();
         request.setStakeholderClaim(claim);
 
-        // TODO: reinstate when implemented on ID&P
-        //        EmailNotificationDto notificationDto = new EmailNotificationDto();
-        //        notificationDto.setDistributionList(List.of("person@mail.com"));
-        //        request.setNotificationMethod(notificationDto);
-
         // when
-
         // TODO: Remove this when reinstating proposals
         Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
 

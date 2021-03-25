@@ -2,19 +2,24 @@ package eu._5gzorro.governancemanager.governanceTests;
 
 import eu._5gzorro.governancemanager.config.Config;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.dto.*;
+import eu._5gzorro.governancemanager.dto.ActionParamsDto;
+import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
-import eu._5gzorro.governancemanager.model.enumeration.*;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalStatusException;
 import eu._5gzorro.governancemanager.repository.GovernanceProposalRepository;
 import eu._5gzorro.governancemanager.service.GovernanceProposalService;
 import eu._5gzorro.governancemanager.service.GovernanceProposalServiceImpl;
+import eu._5gzorro.governancemanager.service.GovernanceService;
 import eu._5gzorro.governancemanager.service.IdentityAndPermissionsApiClient;
 import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -26,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -33,11 +39,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {GovernanceProposalServiceImplUnitTest.GovernanceProposalServiceImplUnitTestContextConfiguration.class })
+@TestPropertySource(properties = { "callbacks.updateProposalIdentity=http://localhost:8080/api/v1/governance-actions/%s/identity" })
 public class GovernanceProposalServiceImplUnitTest {
 
     @TestConfiguration
@@ -50,6 +58,9 @@ public class GovernanceProposalServiceImplUnitTest {
 
     @Autowired
     private GovernanceProposalService governanceProposalService;
+
+    @MockBean
+    private GovernanceService governanceService;
 
     @MockBean
     private GovernanceProposalRepository governanceProposalRepository;
@@ -95,7 +106,7 @@ public class GovernanceProposalServiceImplUnitTest {
         UUID result = governanceProposalService.processGovernanceProposal(stakeholderId, request);
 
         // then
-        String expectedCalbackUrl = String.format("/api/v1/governance-actions/%s/identity", mockedProposalHandle);
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
         verify(governanceProposalRepository, times(1)).save(expectedProposal);
         verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
         assertEquals(mockedProposalHandle, result);
@@ -124,7 +135,7 @@ public class GovernanceProposalServiceImplUnitTest {
         // then
         verify(governanceProposalRepository, times(1)).save(proposal);
 
-        String expectedCalbackUrl = String.format("/api/v1/governance-actions/%s/identity", mockedProposalHandle);
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
         verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
         assertEquals(mockedProposalHandle, result);
     }

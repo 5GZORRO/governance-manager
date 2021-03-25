@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,8 +77,8 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     }
 
     @Override
-    public ResponseEntity updateProposalIdentity(@Valid UUID proposalHandle, @Valid DIDStateDto state) {
-        governanceProposalService.updateGovernanceProposalIdentity(proposalHandle, state);
+    public ResponseEntity updateProposalIdentity(@Valid UUID proposalHandle, @Valid DIDStateDto state) throws IOException {
+        governanceProposalService.completeGovernanceProposalCreation(proposalHandle, state);
         return ResponseEntity.ok().build();
     }
 }

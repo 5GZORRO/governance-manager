@@ -19,7 +19,7 @@ public class StakeholderClaimDto {
     @JsonProperty("governanceBoardDID")
     private String governanceBoardId;
 
-    private List<String> stakeholderServices;
+    private List<StakeholderServiceDto> stakeholderServices;
 
     @Valid
     @Size(min = 1)
@@ -50,11 +50,11 @@ public class StakeholderClaimDto {
         this.governanceBoardId = governanceBoardId;
     }
 
-    public List<String> getStakeholderServices() {
+    public List<StakeholderServiceDto> getStakeholderServices() {
         return stakeholderServices;
     }
 
-    public void setStakeholderServices(List<String> stakeholderServices) {
+    public void setStakeholderServices(List<StakeholderServiceDto> stakeholderServices) {
         this.stakeholderServices = stakeholderServices;
     }
 

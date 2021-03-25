@@ -8,7 +8,7 @@ public class StakeholderRoleDto {
 
     @NotBlank
     private String role;
-    private String assets;
+    private List<String> assets; //TODO: ENUM when available
 
     public StakeholderRoleDto() {
     }
@@ -21,11 +21,11 @@ public class StakeholderRoleDto {
         this.role = role;
     }
 
-    public String getAssets() {
+    public List<String> getAssets() {
         return assets;
     }
 
-    public void setAssets(String assets) {
+    public void setAssets(List<String> assets) {
         this.assets = assets;
     }
 

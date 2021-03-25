@@ -66,16 +66,14 @@ public class MemberServiceImpl implements MemberService {
         Member member = new Member(request.getStakeholderClaim().getDid(), request.getStakeholderClaim().getStakeholderProfile().getName());
         member.setAddress(request.getStakeholderClaim().getStakeholderProfile().getAddress());
         member.setMembershipRequest(objectMapper.writeValueAsBytes(request));
-
-        //TODO: reinstate when ID&P have implemented it
-        //member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getNotificationMethod()));
+        member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getStakeholderClaim().getStakeholderProfile().getNotificationMethod()));
 
         //TODO: Remove this when proposals reinstated
         member.setStatus(MembershipStatus.ACTIVE);
 
         memberRepository.save(member);
 
-        // TODO: reinstate once we have completed intial simple integration or "immediately issue "
+        // TODO: reinstate once we have completed intial simple integration or "immediately issue"
 //        GovernanceProposal proposal = GovernanceProposalMapper.fromNewMembershipRequest(authData.getUserId(), request);
 //        UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
 //        return proposalIdentifier;
@@ -87,7 +85,6 @@ public class MemberServiceImpl implements MemberService {
         catch(Exception e) {
             e.printStackTrace();
         }
-
 
         return uuidSource.newUUID();  // return the proposal UUID here when reinstated
     }

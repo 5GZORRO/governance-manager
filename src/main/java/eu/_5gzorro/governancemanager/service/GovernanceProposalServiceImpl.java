@@ -1,14 +1,15 @@
 package eu._5gzorro.governancemanager.service;
 
-import eu._5gzorro.governancemanager.controller.v1.api.GovernanceActionsController;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
-import eu._5gzorro.governancemanager.dto.identityPermissions.enumeration.DIDStateEnum;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
+import eu._5gzorro.governancemanager.model.exception.DIDCreationException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalStatusException;
 import eu._5gzorro.governancemanager.model.exception.InvalidGovernanceActionException;
@@ -20,13 +21,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +53,11 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     @Autowired
     private AuthData authData;
 
+    @Autowired
+    private GovernanceService governanceService;
+
+    @Value("${callbacks.updateProposalIdentity}")
+    private String updateProposalIdentityCallbackUrl;
 
     @Override
     @Transactional
@@ -69,7 +76,7 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     public UUID processGovernanceProposal(GovernanceProposal proposal) {
 
         if(proposal.getStatus() != GovernanceProposalStatus.CREATING) {
-            log.error(String.format("Attempted to process a proposal not in PROPOSED state. Actual was: %s", proposal.getStatus()));
+            log.error(String.format("Attempted to process a proposal not in CREATING state. Actual was: %s", proposal.getStatus()));
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.CREATING, proposal.getStatus());
         }
 
@@ -84,10 +91,27 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         proposal.setHandle(proposalIdentifier);
         governanceProposalRepository.save(proposal);
 
-        WebMvcLinkBuilder callbackLinkBuilder = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(GovernanceActionsController.class).updateProposalIdentity(proposalIdentifier, null));
-        identityClientService.createDID(callbackLinkBuilder.toUri().toString(), authData.getAuthToken());
+        try {
+            String callbackUrl = String.format(updateProposalIdentityCallbackUrl, proposalIdentifier);
+            identityClientService.createDID(callbackUrl, authData.getAuthToken());
+        }
+        catch (Exception ex) {
+            throw new DIDCreationException(ex);
+        }
 
         return proposalIdentifier;
+    }
+
+    @Override
+    public UUID processIssueCredentialRequest(IssueCredentialRequest request) throws JsonProcessingException {
+
+        GovernanceProposal proposal = GovernanceProposalMapper.fromIssueCredentialRequest(authData.getUserId(), request);
+
+        // TODO: Remove when start using proposals
+        identityClientService.issueCredential(request);
+
+        return uuidSource.newUUID(); // TODO: replace with proposal creation when ID&P ready
+        //return processGovernanceProposal(proposal);
     }
 
     @Override
@@ -145,10 +169,10 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
     @Override
     @Transactional
-    public void updateGovernanceProposalIdentity(UUID proposalHandle, DIDStateDto state) {
+    public void completeGovernanceProposalCreation(UUID proposalHandle, DIDStateDto state) throws IOException {
 
-        if(state.getState() != DIDStateEnum.READY)
-            return;
+//        if(state.getState() != DIDStateEnum.READY)
+//            return;
 
         GovernanceProposal proposal = governanceProposalRepository.findByHandle(proposalHandle)
                 .orElseThrow(() -> new GovernanceProposalNotFoundException(proposalHandle.toString()));
@@ -157,8 +181,18 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.CREATING, proposal.getStatus());
 
         proposal.setId(state.getDid());
-        proposal.setStatus(GovernanceProposalStatus.PROPOSED);
         proposal.setUpdated(LocalDateTime.now());
+
+        final boolean canIssueCredential = governanceService.canIssueCredential(proposal);
+
+        if(canIssueCredential) {
+            governanceService.issueCredential(proposal);
+            proposal.setStatus(GovernanceProposalStatus.APPROVED);
+        }
+        else {
+            proposal.setStatus(GovernanceProposalStatus.PROPOSED);
+        }
+
         governanceProposalRepository.save(proposal);
     }
 

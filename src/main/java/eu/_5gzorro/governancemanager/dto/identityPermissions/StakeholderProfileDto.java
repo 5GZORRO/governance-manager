@@ -13,10 +13,9 @@ public class StakeholderProfileDto {
     private String name;
     private String address;
 
-    // TODO: Re-instate when ID&P has added this
-//    @NotNull
-//    @Valid
-//    private NotificationMethodBase notificationMethod;
+    @NotNull
+    @Valid
+    private NotificationMethodBase notificationMethod;
 
     public StakeholderProfileDto() {
     }
@@ -37,24 +36,33 @@ public class StakeholderProfileDto {
         this.address = address;
     }
 
+    public NotificationMethodBase getNotificationMethod() {
+        return notificationMethod;
+    }
+
+    public void setNotificationMethod(NotificationMethodBase notificationMethod) {
+        this.notificationMethod = notificationMethod;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StakeholderProfileDto that = (StakeholderProfileDto) o;
-        return name.equals(that.name) && Objects.equals(address, that.address);
+        return name.equals(that.name) && address.equals(that.address) && Objects.equals(notificationMethod, that.notificationMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, address);
+        return Objects.hash(name, address, notificationMethod);
     }
 
     @Override
     public String toString() {
-        return "StakeholderProfile{" +
+        return "StakeholderProfileDto{" +
                 "name='" + name + '\'' +
                 ", address='" + address + '\'' +
+                ", notificationMethod=" + notificationMethod +
                 '}';
     }
 }

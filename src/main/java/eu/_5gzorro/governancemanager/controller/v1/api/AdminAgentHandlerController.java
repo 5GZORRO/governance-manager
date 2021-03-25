@@ -34,7 +34,7 @@ public interface AdminAgentHandlerController {
 
 
     @PostMapping("receive")
-    ResponseEntity issue(@Valid @RequestBody final IssueCredentialRequest request);
+    ResponseEntity issue(@Valid @RequestBody final IssueCredentialRequest request) throws JsonProcessingException;
 
 
     @DeleteMapping("receive/{credentialId}")

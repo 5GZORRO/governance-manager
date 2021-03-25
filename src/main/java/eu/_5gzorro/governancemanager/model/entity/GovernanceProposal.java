@@ -2,6 +2,7 @@ package eu._5gzorro.governancemanager.model.entity;
 
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -41,6 +42,11 @@ public class GovernanceProposal {
     private LocalDateTime created = LocalDateTime.now();
 
     private LocalDateTime updated;
+
+    @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name="issue_credential_request")
+    private byte[] issueCredentialRequest;
 
     public GovernanceProposal() {
     }
@@ -115,6 +121,14 @@ public class GovernanceProposal {
 
     public void setUpdated(LocalDateTime updated) {
         this.updated = updated;
+    }
+
+    public byte[] getIssueCredentialRequest() {
+        return issueCredentialRequest;
+    }
+
+    public void setIssueCredentialRequest(byte[] issueCredentialRequest) {
+        this.issueCredentialRequest = issueCredentialRequest;
     }
 
     @Override

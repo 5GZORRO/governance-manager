@@ -28,6 +28,6 @@ public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissio
 
     @Override
     public void issueCredential(IssueCredentialRequest request) {
-        credentialClient.issueCredential(request.getRequestId(), request);
+        credentialClient.issueCredential(request.getId(), request);
     }
 }

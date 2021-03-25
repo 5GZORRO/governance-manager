@@ -6,7 +6,8 @@ import java.util.Objects;
 
 public class DIDStateDto {
     private String did;
-    private DIDStateEnum state;
+//    private DIDStateEnum state;
+    private String state;
 
     public DIDStateDto() {
     }
@@ -19,11 +20,20 @@ public class DIDStateDto {
         this.did = did;
     }
 
-    public DIDStateEnum getState() {
+//    public DIDStateEnum getState() {
+//        return state;
+//    }
+//
+//    public void setState(DIDStateEnum state) {
+//        this.state = state;
+//    }
+
+
+    public String getState() {
         return state;
     }
 
-    public void setState(DIDStateEnum state) {
+    public void setState(String state) {
         this.state = state;
     }
 

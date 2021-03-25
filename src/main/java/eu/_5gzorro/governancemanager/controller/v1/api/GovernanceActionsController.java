@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,5 +90,5 @@ public interface GovernanceActionsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PutMapping("{proposalHandle}/identity")
-    ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID proposalHandle, @Valid @RequestBody final DIDStateDto state);
+    ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID proposalHandle, @Valid @RequestBody final DIDStateDto state) throws IOException;
 }

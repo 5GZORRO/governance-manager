@@ -14,6 +14,6 @@ public interface CredentialClient {
     @RequestMapping(method = RequestMethod.POST, value = "/issuer/issue_stakeholder/{_id}")
     void issueStakeholderCredential(@PathVariable("_id") String id, @RequestBody RegisterStakeholderRequest request);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/issuer/issuer_requested_credential/{holder_request_id}")
-    void issueCredential(@PathVariable("holder_request_id") String holderRequestId, @RequestBody IssueCredentialRequest request);
+    @RequestMapping(method = RequestMethod.POST, value = "/issuer/issue_requested_credential/{_id}")
+    void issueCredential(@PathVariable("_id") String id, @RequestBody IssueCredentialRequest request);
 }
