@@ -1,9 +1,9 @@
 package eu._5gzorro.governancemanager.controller.v1.api;
 
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedMembersResponse;
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.PageableOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,22 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @RequestMapping("/api/v1/memberships")
 @Validated
 @Tag(name = "Stakeholder Membership")
 public interface MembershipsController {
-
-    @Operation(description = "Request 5GZORRO stakeholder membership.  Request is subject to governance prior to approval.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Request was submitted successfully",
-                    content = { @Content(mediaType = "application/json") }),
-            @ApiResponse(responseCode = "400", description = "The request failed validation checks",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
-    @PostMapping
-    ResponseEntity applyForMembership(@Valid @RequestBody final NewMembershipRequest request);
 
     @Operation(description = "Check the status of a 5GZORRO stakeholder membership request ")
     @ApiResponses(value = {
@@ -72,5 +63,5 @@ public interface MembershipsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @DeleteMapping("{stakeholderId}/revoke-membership")
-    ResponseEntity<Optional<String>> revokeMembership(@Valid @PathVariable final String stakeholderId);
+    ResponseEntity<Optional<UUID>> revokeMembership(@Valid @PathVariable final String stakeholderId);
 }

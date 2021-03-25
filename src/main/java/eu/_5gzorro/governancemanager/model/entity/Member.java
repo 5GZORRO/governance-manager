@@ -1,6 +1,7 @@
 package eu._5gzorro.governancemanager.model.entity;
 
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,6 +28,11 @@ public class Member {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberNotificationSetting> notificationSettings = new HashSet<>();
+
+    @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name="membership_request")
+    private byte[] membershipRequest;
 
     @Column(nullable = false)
     private LocalDateTime created = LocalDateTime.now();
@@ -75,6 +81,14 @@ public class Member {
 
     public Set<MemberNotificationSetting> getNotificationSettings() {
         return notificationSettings;
+    }
+
+    public byte[] getMembershipRequest() {
+        return membershipRequest;
+    }
+
+    public void setMembershipRequest(byte[] membershipRequest) {
+        this.membershipRequest = membershipRequest;
     }
 
     public void addNotificationSetting(MemberNotificationSetting setting) {

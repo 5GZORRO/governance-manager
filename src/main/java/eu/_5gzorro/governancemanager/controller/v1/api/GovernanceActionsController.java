@@ -3,6 +3,7 @@ package eu._5gzorro.governancemanager.controller.v1.api;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
 import eu._5gzorro.governancemanager.dto.ApiErrorResponse;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.PageableOperation;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
@@ -19,7 +20,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RequestMapping("/api/v1/governance-actions")
 @Validated
@@ -35,7 +38,7 @@ public interface GovernanceActionsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping
-    ResponseEntity<String> proposeGovernanceDecision(@Valid @RequestBody final ProposeGovernanceDecisionRequest request);
+    ResponseEntity<UUID> proposeGovernanceDecision(@Valid @RequestBody final ProposeGovernanceDecisionRequest request);
 
     @Operation(description = "Retrieve a paged collection of 5GZORRO governance proposals according to paging and filter parameters", tags= { "Governance - All Stakeholders" })
     @ApiResponses(value = {
@@ -75,4 +78,17 @@ public interface GovernanceActionsController {
     })
     @GetMapping("{proposalId}/vote/{accept}")
     ResponseEntity voteGovernanceDecision(@Valid @PathVariable final String proposalId, @Valid @PathVariable final boolean accept);
+
+
+    @Operation(description = "Callback endpoint to handle process async DID identifier generation", tags= { "Governance - Admin Only" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Id was updated successfully",
+                    content = { @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Invalid identifier provided",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "A proposal with the specified Handle was not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PutMapping("{proposalHandle}/identity")
+    ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID proposalHandle, @Valid @RequestBody final DIDStateDto state) throws IOException;
 }

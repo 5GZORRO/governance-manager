@@ -14,3 +14,7 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui
+
+logging:
+  level:
+    eu._5gzorro.governancemanager.httpClient: DEBUG

@@ -73,4 +73,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ApiErrorResponse handleInvalidRequests(HttpServletRequest req, Exception ex) {
         return new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
+
+    @ExceptionHandler({
+            DIDCreationException.class
+    })
+    @ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    protected ApiErrorResponse handleErroredRequests(HttpServletRequest req, Exception ex) {
+        return new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
+    }
 }
