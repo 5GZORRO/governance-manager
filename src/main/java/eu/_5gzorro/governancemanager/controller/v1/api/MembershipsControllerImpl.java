@@ -1,9 +1,9 @@
 package eu._5gzorro.governancemanager.controller.v1.api;
 
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedMembersResponse;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.service.MemberService;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class MembershipsControllerImpl implements MembershipsController {
@@ -27,15 +28,6 @@ public class MembershipsControllerImpl implements MembershipsController {
 
     @Autowired
     private AuthData authData;
-
-    @Override
-    public ResponseEntity<String> applyForMembership(@Valid NewMembershipRequest request) {
-
-        String proposalIdentifier = memberService.processMembershipApplication(request);
-        return ResponseEntity
-                .ok()
-                .body(proposalIdentifier);
-    }
 
     @Override
     public ResponseEntity<MembershipStatusDto> checkMembershipStatus(@Valid String stakeholderId) {
@@ -62,10 +54,16 @@ public class MembershipsControllerImpl implements MembershipsController {
 
         final String requestingStakeholderId = authData.getUserId();
 
-        Optional<String> proposalIdentifier = memberService.revokeMembership(requestingStakeholderId, stakeholderId);
+        Optional<UUID> proposalIdentifier = memberService.revokeMembership(requestingStakeholderId, stakeholderId);
 
         return ResponseEntity
                 .ok()
                 .body(proposalIdentifier);
     }
+
+//    @Override
+//    public ResponseEntity updateMemberIdentity(@Valid UUID memberHandle, @Valid DIDStateDto state) {
+//        memberService.updateMemberIdentity(memberHandle, state);
+//        return ResponseEntity.ok().build();
+//    }
 }

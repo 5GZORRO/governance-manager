@@ -8,8 +8,11 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface GovernanceProposalRepository extends PagingAndSortingRepository<GovernanceProposal, String>, JpaSpecificationExecutor<GovernanceProposal> {
 
     List<GovernanceProposal> findBySubjectIdAndActionTypeAndStatusIn(String subjectId, GovernanceActionType actionType, Collection<GovernanceProposalStatus> statuses);
+    Optional<GovernanceProposal> findByHandle(UUID handle);
 }

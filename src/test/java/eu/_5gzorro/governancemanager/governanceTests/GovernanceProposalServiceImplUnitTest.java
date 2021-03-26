@@ -2,26 +2,25 @@ package eu._5gzorro.governancemanager.governanceTests;
 
 import eu._5gzorro.governancemanager.config.Config;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.controller.v1.request.membership.NewMembershipRequest;
-import eu._5gzorro.governancemanager.dto.*;
+import eu._5gzorro.governancemanager.dto.ActionParamsDto;
+import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.MemberDto;
+import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
-import eu._5gzorro.governancemanager.model.entity.Member;
-import eu._5gzorro.governancemanager.model.entity.MemberNotificationSetting;
-import eu._5gzorro.governancemanager.model.enumeration.*;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalStatusException;
-import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
 import eu._5gzorro.governancemanager.repository.GovernanceProposalRepository;
-import eu._5gzorro.governancemanager.repository.MemberRepository;
 import eu._5gzorro.governancemanager.service.GovernanceProposalService;
 import eu._5gzorro.governancemanager.service.GovernanceProposalServiceImpl;
-import eu._5gzorro.governancemanager.service.MemberService;
-import eu._5gzorro.governancemanager.service.MemberServiceImpl;
+import eu._5gzorro.governancemanager.service.GovernanceService;
+import eu._5gzorro.governancemanager.service.IdentityAndPermissionsApiClient;
+import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.NamingConventions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,17 +31,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {GovernanceProposalServiceImplUnitTest.GovernanceProposalServiceImplUnitTestContextConfiguration.class })
+@TestPropertySource(properties = { "callbacks.updateProposalIdentity=http://localhost:8080/api/v1/governance-actions/%s/identity" })
 public class GovernanceProposalServiceImplUnitTest {
 
     @TestConfiguration
@@ -57,20 +60,32 @@ public class GovernanceProposalServiceImplUnitTest {
     private GovernanceProposalService governanceProposalService;
 
     @MockBean
+    private GovernanceService governanceService;
+
+    @MockBean
     private GovernanceProposalRepository governanceProposalRepository;
+
+    @MockBean
+    private IdentityAndPermissionsApiClient identityClientService;
+
+    @MockBean
+    private AuthData authData;
+
+    @MockBean
+    private UuidSource uuidSource;
 
     @Test
     public void processGovernanceProposal_returnsProposalId() {
 
-        //TODO: Will need to mock out the service that generates the DID
-
-        String proposalId = "DID";
         String stakeholderId = "stakeholderDID";
         String subjectId = "subjectDID";
+        UUID mockedProposalHandle = UUID.randomUUID();
+        String mockedAuthToken = "TOKEN";
 
         GovernanceProposal expectedProposal = new GovernanceProposal();
-        expectedProposal.setId(proposalId);
-        expectedProposal.setStatus(GovernanceProposalStatus.PROPOSED);
+        expectedProposal.setId(mockedProposalHandle.toString());
+        expectedProposal.setStatus(GovernanceProposalStatus.CREATING);
+        expectedProposal.setHandle(mockedProposalHandle);
         expectedProposal.setProposerId(stakeholderId);
         expectedProposal.setSubjectId(subjectId);
         expectedProposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
@@ -79,40 +94,50 @@ public class GovernanceProposalServiceImplUnitTest {
         ProposeGovernanceDecisionRequest request = new ProposeGovernanceDecisionRequest();
         request.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
+
         ActionParamsDto actionParams = new ActionParamsDto();
         actionParams.setEntityIdentityId(subjectId);
         request.setActionParams(actionParams);
 
         // when
-        String result = governanceProposalService.processGovernanceProposal(stakeholderId, request);
+        Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
+        Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
+
+        UUID result = governanceProposalService.processGovernanceProposal(stakeholderId, request);
 
         // then
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
         verify(governanceProposalRepository, times(1)).save(expectedProposal);
-        assertEquals(proposalId, result);
+        verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
+        assertEquals(mockedProposalHandle, result);
     }
 
     @Test
     public void processGovernanceProposal_methodOverload_returnsProposalId() {
 
-        //TODO: Will need to mock out the service that generates the DID
-
-        String proposalId = "DID";
         String stakeholderId = "stakeholderDID";
         String subjectId = "subjectDID";
+        UUID mockedProposalHandle = UUID.randomUUID();
+        String mockedAuthToken = "TOKEN";
 
         GovernanceProposal proposal = new GovernanceProposal();
-        proposal.setId(proposalId);
-        proposal.setStatus(GovernanceProposalStatus.PROPOSED);
+        proposal.setStatus(GovernanceProposalStatus.CREATING);
         proposal.setProposerId(stakeholderId);
         proposal.setSubjectId(subjectId);
         proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         // when
-        String result = governanceProposalService.processGovernanceProposal(proposal);
+        Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
+        Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
+
+        UUID result = governanceProposalService.processGovernanceProposal(proposal);
 
         // then
         verify(governanceProposalRepository, times(1)).save(proposal);
-        assertEquals(proposalId, result);
+
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
+        verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
+        assertEquals(mockedProposalHandle, result);
     }
 
     @Test

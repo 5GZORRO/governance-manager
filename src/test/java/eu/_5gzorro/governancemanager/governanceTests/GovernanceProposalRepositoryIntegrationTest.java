@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,6 +35,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p1 = new GovernanceProposal();
         p1.setId("1");
+        p1.setHandle(UUID.randomUUID());
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.PROPOSED);
@@ -41,6 +43,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p2 = new GovernanceProposal();
         p2.setId("3");
+        p2.setHandle(UUID.randomUUID());
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
@@ -74,6 +77,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p1 = new GovernanceProposal();
         p1.setId("1");
+        p1.setHandle(UUID.randomUUID());
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.PROPOSED);
@@ -81,6 +85,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p2 = new GovernanceProposal();
         p2.setId("3");
+        p2.setHandle(UUID.randomUUID());
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
@@ -115,6 +120,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p1 = new GovernanceProposal();
         p1.setId("1");
+        p1.setHandle(UUID.randomUUID());
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.APPROVED);
@@ -122,6 +128,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
 
         GovernanceProposal p2 = new GovernanceProposal();
         p2.setId("3");
+        p2.setHandle(UUID.randomUUID());
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
