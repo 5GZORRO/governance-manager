@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "governance-manager-api.fullname" . }}
+  labels:
+    {{- include "governance-manager-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "governance-manager-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "governance-manager-api.fullname" . }}
+        {{- include "governance-manager-api.selectorLabels" . | nindent 8 }}
+    spec:
+      nodeSelector:
+        environment: {{ .Values.environment.nodeSelector }}
+      tolerations:
+        - key: environment
+          operator: Equal
+          value: {{ .Values.environment.nodeSelector }}
+          effect: NoSchedule
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "governance-manager-api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "docker.pkg.github.com/5gzorro/governance-manager/governance-manager-api:{{ .Values.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+        env:
+        # [SQL Configuration]
+        - name: POSTGRES_DB_HOST
+          value: "127.0.0.1"
+        - name: POSTGRES_DB_PORT
+          value: "5432"
+        - name: POSTGRES_DB_USER
+          valueFrom:
+              secretKeyRef:
+                  name: governance-mgr-db-credentials
+                  key: username
+        - name: POSTGRES_DB_PASSWORD
+          valueFrom:
+              secretKeyRef:
+                  name: governance-mgr-db-credentials
+                  key: password
+        - name: POSTGRES_DB_NAME
+          valueFrom:
+              secretKeyRef:
+                  name: governance-mgr-db-credentials
+                  key: name
+        # [Application Environment Variables]
+        - name: SPRING_PROFILES_ACTIVE
+          value: {{ .Values.spring.profiles }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: {{ .Values.service.appPort }}
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          failureThreshold:  {{ .Values.livenessProbe.failureThreshold }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.probePath }}
+            port: {{ .Values.service.appPort }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          failureThreshold:  {{ .Values.livenessProbe.failureThreshold }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.14
+        command: ["/cloud_sql_proxy",
+                  "-instances=bartr-technologies:europe-west2:rainman=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        # [START cloudsql_security_context]
+        securityContext:
+            runAsUser: 2  # non-root user
+            allowPrivilegeEscalation: false
+            # [END cloudsql_security_context]
+        volumeMounts:
+        - name: insights-cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      # [START volumes]
+      volumes:
+          - name: insights-cloudsql-instance-credentials
+            secret:
+                secretName: insights-cloudsql-instance-credentials
+      # [END volumes]
