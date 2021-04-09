@@ -2,7 +2,7 @@ dockerTag: v0.1.2
 
 identityBaseUrl: "http://localhost:6200"
 callbacks:
-    updateProposal: "http://localhost:8080/api/v1/governance-actions/%s/identity"
+    updateProposal: "http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
 
 fullnameOverride: "governance-manager-app"
 
