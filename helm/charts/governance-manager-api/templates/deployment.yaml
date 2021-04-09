@@ -19,13 +19,6 @@ spec:
         app: {{ include "governance-manager-api.fullname" . }}
         {{- include "governance-manager-api.selectorLabels" . | nindent 8 }}
     spec:
-      nodeSelector:
-        environment: {{ .Values.environment.nodeSelector }}
-      tolerations:
-        - key: environment
-          operator: Equal
-          value: {{ .Values.environment.nodeSelector }}
-          effect: NoSchedule
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -37,7 +30,7 @@ spec:
       - name: {{ .Chart.Name }}
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
-        image: "docker.pkg.github.com/5gzorro/governance-manager/governance-manager-api:{{ .Values.AppVersion }}"
+        image: "docker.pkg.github.com/5gzorro/governance-manager/governance-manager-api:{{ .Values.dockerTag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: 8080
@@ -45,9 +38,13 @@ spec:
         env:
         # [SQL Configuration]
         - name: POSTGRES_DB_HOST
-          value: "127.0.0.1"
+          value: {{ .Values.postgres.host }}
         - name: POSTGRES_DB_PORT
-          value: "5432"
+          value: "{{ .Values.postgres.port }}"
+        - name: IDENTITY_BASE_URL
+          value: {{ .Values.identityBaseUrl }}
+        - name: UPDATE_PROPOSAL_CALLBACK_URL
+          value: {{ .Values.callbacks.updateProposal }}
         - name: POSTGRES_DB_USER
           valueFrom:
               secretKeyRef:
@@ -86,24 +83,3 @@ spec:
           failureThreshold:  {{ .Values.livenessProbe.failureThreshold }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-      - name: cloudsql-proxy
-        image: gcr.io/cloudsql-docker/gce-proxy:1.14
-        command: ["/cloud_sql_proxy",
-                  "-instances=bartr-technologies:europe-west2:rainman=tcp:5432",
-                  "-credential_file=/secrets/cloudsql/credentials.json"]
-        # [START cloudsql_security_context]
-        securityContext:
-            runAsUser: 2  # non-root user
-            allowPrivilegeEscalation: false
-            # [END cloudsql_security_context]
-        volumeMounts:
-        - name: insights-cloudsql-instance-credentials
-          mountPath: /secrets/cloudsql
-          readOnly: true
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-      # [START volumes]
-      volumes:
-          - name: insights-cloudsql-instance-credentials
-            secret:
-                secretName: insights-cloudsql-instance-credentials
-      # [END volumes]
