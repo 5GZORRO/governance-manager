@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>eu._5gzorro</groupId>
 	<artifactId>governance-manager</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>governance-manager</name>
 	<description>A Spring Boot API written in Java providing governance functions in the 5GZORRO ecosystem</description>
 	<properties>
@@ -20,6 +20,8 @@
 		<modelmapper.version>2.3.2</modelmapper.version>
 		<spring-cloud.version>2020.0.1</spring-cloud.version>
 		<io.github.openfeign.version>11.0</io.github.openfeign.version>
+
+    	<revision>0.0.1-SNAPSHOT</revision>
 	</properties>
 
 	<dependencyManagement>
