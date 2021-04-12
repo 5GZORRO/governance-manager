@@ -1,6 +1,6 @@
 dockerTag: v0.1.2
 
-identityBaseUrl: "http://localhost:6200"
+identityBaseUrl: "https://5gzorro.alticelabs.com/admin"
 callbacks:
     updateProposal: "http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
 
