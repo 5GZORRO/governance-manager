@@ -29,8 +29,6 @@ public class StakeholderClaimDto {
     @NotNull
     private StakeholderProfileDto stakeholderProfile;
 
-    private String verKey;
-
     public StakeholderClaimDto() {
     }
 
@@ -74,25 +72,17 @@ public class StakeholderClaimDto {
         this.stakeholderProfile = stakeholderProfile;
     }
 
-    public String getVerKey() {
-        return verKey;
-    }
-
-    public void setVerKey(String verKey) {
-        this.verKey = verKey;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StakeholderClaimDto that = (StakeholderClaimDto) o;
-        return did.equals(that.did) && Objects.equals(governanceBoardId, that.governanceBoardId) && Objects.equals(stakeholderServices, that.stakeholderServices) && Objects.equals(stakeholderRoles, that.stakeholderRoles) && stakeholderProfile.equals(that.stakeholderProfile) && Objects.equals(verKey, that.verKey);
+        return did.equals(that.did) && Objects.equals(governanceBoardId, that.governanceBoardId) && Objects.equals(stakeholderServices, that.stakeholderServices) && Objects.equals(stakeholderRoles, that.stakeholderRoles) && stakeholderProfile.equals(that.stakeholderProfile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(did, governanceBoardId, stakeholderServices, stakeholderRoles, stakeholderProfile, verKey);
+        return Objects.hash(did, governanceBoardId, stakeholderServices, stakeholderRoles, stakeholderProfile);
     }
 
     @Override
@@ -103,7 +93,6 @@ public class StakeholderClaimDto {
                 ", stakeholderServices=" + stakeholderServices +
                 ", stakeholderRoles=" + stakeholderRoles +
                 ", stakeholderProfile=" + stakeholderProfile +
-                ", verKey='" + verKey + '\'' +
                 '}';
     }
 }

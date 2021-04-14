@@ -9,17 +9,17 @@ import java.util.Collection;
 public class EmailNotificationDto extends NotificationMethodBase {
 
     @DistributionListConstraint
-    private Collection<String> distributionList;
+    private String distributionList;
 
     public EmailNotificationDto() {
         super(NotificationType.EMAIL);
     }
 
-    public Collection<String> getDistributionList() {
+    public String getDistributionList() {
         return distributionList;
     }
 
-    public EmailNotificationDto setDistributionList(Collection<String> distributionList) {
+    public EmailNotificationDto setDistributionList(String distributionList) {
         this.distributionList = distributionList;
         return this;
     }

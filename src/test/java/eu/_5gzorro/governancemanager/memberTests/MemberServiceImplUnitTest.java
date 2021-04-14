@@ -115,7 +115,7 @@ class MemberServiceImplUnitTest {
 
         // given
         EmailNotificationDto notificationDto = new EmailNotificationDto();
-        notificationDto.setDistributionList(List.of("person@mail.com"));
+        notificationDto.setDistributionList("person@mail.com");
 
         StakeholderProfileDto profile = new StakeholderProfileDto();
         profile.setName("Telefonica");

@@ -1,6 +1,6 @@
 dockerTag: v0.1.2
 
-identityBaseUrl: "http://172.28.3.153:6200/admin"
+identityBaseUrl: "http://172.28.3.153:6200"
 callbacks:
     updateProposal: "http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
 

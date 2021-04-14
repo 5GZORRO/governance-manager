@@ -1,12 +1,18 @@
 package eu._5gzorro.governancemanager.validator;
 
+import org.apache.logging.log4j.util.Strings;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class DistributionListValidator implements ConstraintValidator<DistributionListConstraint, Collection<String>> {
+public class DistributionListValidator implements ConstraintValidator<DistributionListConstraint, String> {
 
     private final Pattern VALID_EMAIL_ADDRESS_REGEX =
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -16,10 +22,15 @@ public class DistributionListValidator implements ConstraintValidator<Distributi
     }
 
     @Override
-    public boolean isValid(Collection<String> distributionListField,
+    public boolean isValid(String distributionListField,
                            ConstraintValidatorContext cxt) {
 
-        return distributionListField.size() > 0 && distributionListField.stream().allMatch(email -> {
+        if(distributionListField == null)
+            return false;
+
+        List<String> recipients = Arrays.stream(distributionListField.split(",")).collect(Collectors.toList());
+
+        return recipients.size() > 0 && recipients.stream().allMatch(email -> {
             Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
             return matcher.find();
         });

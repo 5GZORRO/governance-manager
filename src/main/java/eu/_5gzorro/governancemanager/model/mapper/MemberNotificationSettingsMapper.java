@@ -27,7 +27,7 @@ public class MemberNotificationSettingsMapper {
         MemberNotificationSetting setting = new MemberNotificationSetting()
                 .notificationType(NotificationType.EMAIL)
                 .setting(NotificationSetting.EMAIL_DISTRIBUTION_LIST)
-                .value(notificationMethod.getDistributionList().stream().collect(Collectors.joining(",")));
+                .value(notificationMethod.getDistributionList());
 
         return Set.of(setting);
     }
