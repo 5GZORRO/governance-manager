@@ -42,5 +42,6 @@ jobs:
             --namespace operatora-ns \
             --repo ./helm/charts/governance-manager-api/ \
             --values ./helm/charts/governance-manager-api/values.yaml \
+            --set dockerTag=${{ env.RELEASE_VERSION }} \
             --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
             --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }}
