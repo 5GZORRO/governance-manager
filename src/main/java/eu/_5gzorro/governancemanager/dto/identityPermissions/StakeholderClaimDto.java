@@ -1,7 +1,6 @@
 package eu._5gzorro.governancemanager.dto.identityPermissions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +12,7 @@ import java.util.Objects;
 public class StakeholderClaimDto {
 
     @NotBlank
+    @JsonProperty("stakeholderDID")
     private String did;
 
     @NotBlank
@@ -89,7 +89,7 @@ public class StakeholderClaimDto {
     public String toString() {
         return "StakeholderClaimDto{" +
                 "did='" + did + '\'' +
-                ", governanceBoardId='" + governanceBoardId + '\'' +
+                ", governanceBoardDid='" + governanceBoardId + '\'' +
                 ", stakeholderServices=" + stakeholderServices +
                 ", stakeholderRoles=" + stakeholderRoles +
                 ", stakeholderProfile=" + stakeholderProfile +
