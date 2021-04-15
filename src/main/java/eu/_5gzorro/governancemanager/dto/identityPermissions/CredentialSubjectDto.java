@@ -1,6 +1,7 @@
 package eu._5gzorro.governancemanager.dto.identityPermissions;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Objects;
 
 public class CredentialSubjectDto {
@@ -8,7 +9,7 @@ public class CredentialSubjectDto {
     @NotBlank
     private String id;
 
-    private ClaimDto claims;  //TODO: Change to List<ClaimDTO> when schema known
+    private List<ClaimDto> claims;
 
     public CredentialSubjectDto() {
     }
@@ -21,11 +22,11 @@ public class CredentialSubjectDto {
         this.id = id;
     }
 
-    public ClaimDto getClaims() {
+    public List<ClaimDto> getClaims() {
         return claims;
     }
 
-    public void setClaims(ClaimDto claims) {
+    public void setClaims(List<ClaimDto> claims) {
         this.claims = claims;
     }
 
