@@ -33,17 +33,18 @@ public class GovernanceProposalRepositoryIntegrationTest {
     @Test
     public void whenStatusFilterProvided_thenReturnMatchingProposals() {
 
+
         GovernanceProposal p1 = new GovernanceProposal();
-        p1.setId("1");
-        p1.setHandle(UUID.randomUUID());
+        p1.setId(UUID.randomUUID());
+        p1.setDid("did:5gzorro:0123456781");
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.PROPOSED);
         p1.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         GovernanceProposal p2 = new GovernanceProposal();
-        p2.setId("3");
-        p2.setHandle(UUID.randomUUID());
+        p2.setId(UUID.randomUUID());
+        p2.setDid("did:5gzorro:0123456782");
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
@@ -76,16 +77,16 @@ public class GovernanceProposalRepositoryIntegrationTest {
     public void whenActionTypeFilterProvided_thenReturnMatchingProposals() {
 
         GovernanceProposal p1 = new GovernanceProposal();
-        p1.setId("1");
-        p1.setHandle(UUID.randomUUID());
+        p1.setId(UUID.randomUUID());
+        p1.setDid("did:5gzorro:0123456781");
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.PROPOSED);
         p1.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         GovernanceProposal p2 = new GovernanceProposal();
-        p2.setId("3");
-        p2.setHandle(UUID.randomUUID());
+        p2.setId(UUID.randomUUID());
+        p2.setDid("did:5gzorro:0123456782");
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
@@ -119,16 +120,16 @@ public class GovernanceProposalRepositoryIntegrationTest {
     public void whenActionTypeAndStatusFilterProvided_thenReturnMatchingProposals() {
 
         GovernanceProposal p1 = new GovernanceProposal();
-        p1.setId("1");
-        p1.setHandle(UUID.randomUUID());
+        p1.setId(UUID.randomUUID());
+        p1.setDid("did:5gzorro:0123456781");
         p1.setProposerId("proposer_123");
         p1.setSubjectId("subject_123");
         p1.setStatus(GovernanceProposalStatus.APPROVED);
         p1.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         GovernanceProposal p2 = new GovernanceProposal();
-        p2.setId("3");
-        p2.setHandle(UUID.randomUUID());
+        p2.setId(UUID.randomUUID());
+        p2.setDid("did:5gzorro:0123456782");
         p2.setProposerId("proposer_1");
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);

@@ -61,13 +61,13 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
     @Override
     @Transactional
-    public UUID processGovernanceProposal(String requestingStakeholderId, ProposeGovernanceDecisionRequest request) {
+    public UUID processGovernanceProposal(String requestingStakeholderDid, ProposeGovernanceDecisionRequest request) {
 
         if(request.getActionType() == GovernanceActionType.REVOKE_STAKEHOLDER_MEMBERSHIP || request.getActionType() == GovernanceActionType.ONBOARD_STAKEHOLDER) {
             throw new InvalidGovernanceActionException(request.getActionType());
         }
 
-        GovernanceProposal proposal = GovernanceProposalMapper.fromProposeGovernanceDecisionRequest(requestingStakeholderId, request);
+        GovernanceProposal proposal = GovernanceProposalMapper.fromProposeGovernanceDecisionRequest(requestingStakeholderDid, request);
         return processGovernanceProposal(proposal);
     }
 
@@ -87,9 +87,6 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         }
 
         UUID proposalIdentifier = uuidSource.newUUID();
-        proposal.setId(proposalIdentifier.toString());
-        proposal.setHandle(proposalIdentifier);
-        governanceProposalRepository.save(proposal);
 
         try {
             String callbackUrl = String.format(updateProposalIdentityCallbackUrl, proposalIdentifier);
@@ -98,6 +95,9 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         catch (Exception ex) {
             throw new DIDCreationException(ex);
         }
+
+        proposal.setId(proposalIdentifier);
+        governanceProposalRepository.save(proposal);
 
         return proposalIdentifier;
     }
@@ -129,23 +129,32 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     }
 
     @Override
-    public GovernanceProposalDto getGovernanceProposal(String id) {
+    public GovernanceProposalDto getGovernanceProposalByDid(String did) {
+
+        GovernanceProposal proposal = governanceProposalRepository.findByDid(did)
+                .orElseThrow(() -> new GovernanceProposalNotFoundException(did));
+
+        return GovernanceProposalMapper.toGovernanceProposalDto(proposal);
+    }
+
+    @Override
+    public GovernanceProposalDto getGovernanceProposalById(UUID id) {
 
         GovernanceProposal proposal = governanceProposalRepository.findById(id)
-                .orElseThrow(() -> new GovernanceProposalNotFoundException(id));
+                .orElseThrow(() -> new GovernanceProposalNotFoundException(id.toString()));
 
         return GovernanceProposalMapper.toGovernanceProposalDto(proposal);
     }
 
     @Override
     @Transactional
-    public void voteOnGovernanceProposal(String votingStakeholderId, String id, boolean accept) {
+    public void voteOnGovernanceProposal(String votingStakeholderDid, String did, boolean accept) {
 
-        GovernanceProposal proposal = governanceProposalRepository.findById(id)
-                .orElseThrow(() -> new GovernanceProposalNotFoundException(id));
+        GovernanceProposal proposal = governanceProposalRepository.findByDid(did)
+                .orElseThrow(() -> new GovernanceProposalNotFoundException(did));
 
         if(proposal.getStatus() != GovernanceProposalStatus.PROPOSED) {
-            log.error(String.format("Attempted to vote on a proposal not in PROPOSED state with id %s.  Actual state: %s", id, proposal.getStatus()));
+            log.error(String.format("Attempted to vote on a proposal not in PROPOSED state with id %s.  Actual state: %s", did, proposal.getStatus()));
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.PROPOSED, proposal.getStatus());
         }
 
@@ -164,23 +173,23 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         // TODO: Determine result
         boolean upheld = true;
 
-        completeVotingForProposal(votingStakeholderId, proposal, upheld);
+        completeVotingForProposal(votingStakeholderDid, proposal, upheld);
     }
 
     @Override
     @Transactional
-    public void completeGovernanceProposalCreation(UUID proposalHandle, DIDStateDto state) throws IOException {
+    public void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException {
 
 //        if(state.getState() != DIDStateEnum.READY)
 //            return;
 
-        GovernanceProposal proposal = governanceProposalRepository.findByHandle(proposalHandle)
-                .orElseThrow(() -> new GovernanceProposalNotFoundException(proposalHandle.toString()));
+        GovernanceProposal proposal = governanceProposalRepository.findById(id)
+                .orElseThrow(() -> new GovernanceProposalNotFoundException(id.toString()));
 
         if(proposal.getStatus() != GovernanceProposalStatus.CREATING)
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.CREATING, proposal.getStatus());
 
-        proposal.setId(state.getDid());
+        proposal.setDid(state.getDid());
         proposal.setUpdated(LocalDateTime.now());
 
         final boolean canIssueCredential = governanceService.canIssueCredential(proposal);
@@ -196,7 +205,7 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         governanceProposalRepository.save(proposal);
     }
 
-    private void completeVotingForProposal(String votingStakeholderId, GovernanceProposal proposal, boolean upheld) {
+    private void completeVotingForProposal(String votingStakeholderDid, GovernanceProposal proposal, boolean upheld) {
 
         // TODO: Issue VC with result approved/rejected
 

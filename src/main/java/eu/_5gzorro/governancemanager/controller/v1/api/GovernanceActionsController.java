@@ -30,7 +30,7 @@ public interface GovernanceActionsController {
 
     @Operation(description = "Propose a governance decision. Request is subject to governance prior to approval.  The resulting identifier can be used to track the progress/status of the proposal", tags= { "Governance - All Stakeholders" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Request was submitted successfully.  The proposal Id is returned in the response",
+            @ApiResponse(responseCode = "202", description = "Request was submitted successfully.  The proposal Id is returned in the response",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "The request failed validation checks",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -38,7 +38,7 @@ public interface GovernanceActionsController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping
-    ResponseEntity<UUID> proposeGovernanceDecision(@Valid @RequestBody final ProposeGovernanceDecisionRequest request);
+    ResponseEntity<String> proposeGovernanceDecision(@Valid @RequestBody final ProposeGovernanceDecisionRequest request);
 
     @Operation(description = "Retrieve a paged collection of 5GZORRO governance proposals according to paging and filter parameters", tags= { "Governance - All Stakeholders" })
     @ApiResponses(value = {
@@ -55,17 +55,17 @@ public interface GovernanceActionsController {
             @RequestParam(required = false) @Parameter(description = "Optional comma separated list of actionTypes to filter the response by") final List<GovernanceActionType> actionTypeFilter);
 
 
-    @Operation(description = "Retrieve a 5GZORRO governance proposal including current status information", tags= { "Governance - All Stakeholders" })
+    @Operation(description = "Retrieve a 5GZORRO governance proposal including current status information by id or DID", tags= { "Governance - All Stakeholders" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns status information pertaining to the request",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "Invalid identifier provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "A proposal with the specified Id was not found",
+            @ApiResponse(responseCode = "404", description = "A proposal with the specified identifier was not found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @GetMapping("{proposalId}")
-    ResponseEntity<GovernanceProposalDto> getGovernanceProposal(@Valid @PathVariable final String proposalId);
+    @GetMapping("{identifier}")
+    ResponseEntity<GovernanceProposalDto> getGovernanceProposal(@Valid @PathVariable final String identifier);
 
     @Operation(description = "Vote on a 5GZORRO governance proposal", tags= { "Governance - Admin Only" })
     @ApiResponses(value = {
@@ -73,22 +73,22 @@ public interface GovernanceActionsController {
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "Invalid identifier provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "A proposal with the specified Id was not found",
+            @ApiResponse(responseCode = "404", description = "A proposal with the specified DID was not found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @GetMapping("{proposalId}/vote/{accept}")
-    ResponseEntity voteGovernanceDecision(@Valid @PathVariable final String proposalId, @Valid @PathVariable final boolean accept);
+    @GetMapping("{proposalDid}/vote/{accept}")
+    ResponseEntity voteGovernanceDecision(@Valid @PathVariable final String proposalDid, @Valid @PathVariable final boolean accept);
 
 
     @Operation(description = "Callback endpoint to handle process async DID identifier generation", tags= { "Governance - Admin Only" })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Id was updated successfully",
+            @ApiResponse(responseCode = "200", description = "Proposal DID assigned successfully",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "Invalid identifier provided",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "A proposal with the specified Handle was not found",
+            @ApiResponse(responseCode = "404", description = "A proposal with the specified Id was not found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @PutMapping("{proposalHandle}/identity")
-    ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID proposalHandle, @Valid @RequestBody final DIDStateDto state) throws IOException;
+    @PutMapping("{id}/identity")
+    ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID id, @Valid @RequestBody final DIDStateDto state) throws IOException;
 }

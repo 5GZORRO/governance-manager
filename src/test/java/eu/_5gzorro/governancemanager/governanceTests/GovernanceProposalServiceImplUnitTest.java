@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -79,13 +78,12 @@ public class GovernanceProposalServiceImplUnitTest {
 
         String stakeholderId = "stakeholderDID";
         String subjectId = "subjectDID";
-        UUID mockedProposalHandle = UUID.randomUUID();
+        UUID expectedId = UUID.randomUUID();
         String mockedAuthToken = "TOKEN";
 
         GovernanceProposal expectedProposal = new GovernanceProposal();
-        expectedProposal.setId(mockedProposalHandle.toString());
+        expectedProposal.setId(expectedId);
         expectedProposal.setStatus(GovernanceProposalStatus.CREATING);
-        expectedProposal.setHandle(mockedProposalHandle);
         expectedProposal.setProposerId(stakeholderId);
         expectedProposal.setSubjectId(subjectId);
         expectedProposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
@@ -101,15 +99,15 @@ public class GovernanceProposalServiceImplUnitTest {
 
         // when
         Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
-        Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
+        Mockito.when(uuidSource.newUUID()).thenReturn(expectedId);
 
         UUID result = governanceProposalService.processGovernanceProposal(stakeholderId, request);
 
         // then
-        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", expectedId);
         verify(governanceProposalRepository, times(1)).save(expectedProposal);
         verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
-        assertEquals(mockedProposalHandle, result);
+        assertEquals(expectedId, result);
     }
 
     @Test
@@ -117,7 +115,7 @@ public class GovernanceProposalServiceImplUnitTest {
 
         String stakeholderId = "stakeholderDID";
         String subjectId = "subjectDID";
-        UUID mockedProposalHandle = UUID.randomUUID();
+        UUID expectedId = UUID.randomUUID();
         String mockedAuthToken = "TOKEN";
 
         GovernanceProposal proposal = new GovernanceProposal();
@@ -128,16 +126,16 @@ public class GovernanceProposalServiceImplUnitTest {
 
         // when
         Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
-        Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
+        Mockito.when(uuidSource.newUUID()).thenReturn(expectedId);
 
         UUID result = governanceProposalService.processGovernanceProposal(proposal);
 
         // then
         verify(governanceProposalRepository, times(1)).save(proposal);
 
-        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", mockedProposalHandle);
+        String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", expectedId);
         verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
-        assertEquals(mockedProposalHandle, result);
+        assertEquals(expectedId, result);
     }
 
     @Test
@@ -145,7 +143,8 @@ public class GovernanceProposalServiceImplUnitTest {
 
         // given
         GovernanceProposal proposal = new GovernanceProposal();
-        proposal.setId("proposalDID");
+        proposal.setId(UUID.randomUUID());
+        proposal.setDid("did:5gzorro:64654654564");
         proposal.setStatus(GovernanceProposalStatus.APPROVED);
         proposal.setProposerId("stakeholderDID");
         proposal.setSubjectId("subjectDID");
@@ -165,21 +164,21 @@ public class GovernanceProposalServiceImplUnitTest {
         // when
         // Entities in db:
         GovernanceProposal proposal1 = new GovernanceProposal();
-        proposal1.setId("proposal1");
+        proposal1.setId(UUID.randomUUID());
         proposal1.setStatus(GovernanceProposalStatus.PROPOSED);
         proposal1.setProposerId("stakeholder1");
         proposal1.setSubjectId("template1");
         proposal1.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         GovernanceProposal proposal2 = new GovernanceProposal();
-        proposal2.setId("proposal2");
+        proposal2.setId(UUID.randomUUID());
         proposal2.setStatus(GovernanceProposalStatus.APPROVED);
         proposal2.setProposerId("stakeholder1");
         proposal2.setSubjectId("template2");
         proposal2.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         GovernanceProposal proposal3 = new GovernanceProposal();
-        proposal3.setId("proposal3");
+        proposal3.setId(UUID.randomUUID());
         proposal3.setStatus(GovernanceProposalStatus.PROPOSED);
         proposal3.setProposerId("stakeholder1");
         proposal3.setSubjectId("stakeholder1233");
@@ -199,44 +198,83 @@ public class GovernanceProposalServiceImplUnitTest {
         assertEquals(expectedPage.getSize(), result.getSize());
 
         for (int i = 0; i < expectedPage.getSize(); i++) {
-            assertEquals(expectedPage.getContent().get(i).getId(), result.getContent().get(i).getProposalId());
+            assertTrue(expectedPage.getContent().get(i).getId().toString().equals(result.getContent().get(i).getProposalId()));
         }
     }
 
     @Test
-    public void getGovernanceProposal_returnsMatchingGovernanceProposalDto() {
+    public void getGovernanceProposalById_returnsMatchingGovernanceProposalDto() {
 
-        final String proposalId = "1";
+        final UUID expectedProposalId = UUID.randomUUID();
         GovernanceProposalDto expected = new GovernanceProposalDto();
-        expected.setProposalId(proposalId);
+        expected.setProposalId(expectedProposalId.toString());
         expected.setStatus(GovernanceProposalStatus.PROPOSED);
         expected.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         // given
         GovernanceProposal proposal = new GovernanceProposal();
-        proposal.setId(proposalId);
+        proposal.setId(expectedProposalId);
         proposal.setStatus(GovernanceProposalStatus.PROPOSED);
         proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
-        when(governanceProposalRepository.findById(proposalId)).thenReturn(Optional.of(proposal));
+        when(governanceProposalRepository.findById(expectedProposalId)).thenReturn(Optional.of(proposal));
 
         // when
-        GovernanceProposalDto result = governanceProposalService.getGovernanceProposal(proposalId);
+        GovernanceProposalDto result = governanceProposalService.getGovernanceProposalById(expectedProposalId);
 
         // then
-        verify(governanceProposalRepository, times(1)).findById(proposalId);
+        verify(governanceProposalRepository, times(1)).findById(expectedProposalId);
         assertEquals(expected, result);
     }
 
     @Test
-    public void getGovernanceProposal_throwsGovernanceProposalNotFoundException_whenNotFound() {
+    public void getGovernanceProposalById_throwsGovernanceProposalNotFoundException_whenNotFound() {
 
         // given
-        final String proposalId = "1";
-        when(governanceProposalRepository.findById(proposalId)).thenReturn(Optional.empty());
+        final UUID expectedProposalId = UUID.randomUUID();
+        when(governanceProposalRepository.findById(expectedProposalId)).thenReturn(Optional.empty());
 
         // then
-        Throwable exception = assertThrows(GovernanceProposalNotFoundException.class, () -> governanceProposalService.getGovernanceProposal(proposalId));
+        Throwable exception = assertThrows(GovernanceProposalNotFoundException.class, () -> governanceProposalService.getGovernanceProposalById(expectedProposalId));
+    }
+
+
+    @Test
+    public void getGovernanceProposaByDid_returnsMatchingGovernanceProposalDto() {
+
+        final UUID expectedProposalId = UUID.randomUUID();
+        final String expectedDid = "did:5gzorro:354654621523184";
+        GovernanceProposalDto expected = new GovernanceProposalDto();
+        expected.setProposalId(expectedDid);
+        expected.setStatus(GovernanceProposalStatus.PROPOSED);
+        expected.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
+
+        // given
+        GovernanceProposal proposal = new GovernanceProposal();
+        proposal.setId(expectedProposalId);
+        proposal.setDid(expectedDid);
+        proposal.setStatus(GovernanceProposalStatus.PROPOSED);
+        proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
+
+        when(governanceProposalRepository.findByDid(expectedDid)).thenReturn(Optional.of(proposal));
+
+        // when
+        GovernanceProposalDto result = governanceProposalService.getGovernanceProposalByDid(expectedDid);
+
+        // then
+        verify(governanceProposalRepository, times(1)).findByDid(expectedDid);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void getGovernanceProposalByDid_throwsGovernanceProposalNotFoundException_whenNotFound() {
+
+        // given
+        final String expectedDid = "did:5gzorro:354654621523184";
+        when(governanceProposalRepository.findByDid(expectedDid)).thenReturn(Optional.empty());
+
+        // then
+        Throwable exception = assertThrows(GovernanceProposalNotFoundException.class, () -> governanceProposalService.getGovernanceProposalByDid(expectedDid));
     }
 
 
@@ -244,35 +282,39 @@ public class GovernanceProposalServiceImplUnitTest {
     public void voteOnGovernanceProposal_throwsGovernanceProposalStatusException_whenNotInProposedState() {
 
         // given
-        final String proposalId = "1";
+        final UUID proposalId = UUID.randomUUID();
+        final String did = "did:5gzorro:354654621523184";
         final String votingStakeholderId = "DID";
 
         final GovernanceProposal proposal = new GovernanceProposal();
         proposal.setId(proposalId);
+        proposal.setDid(did);
         proposal.setStatus(GovernanceProposalStatus.APPROVED);
         proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
-        when(governanceProposalRepository.findById(proposalId)).thenReturn(Optional.of(proposal));
+        when(governanceProposalRepository.findByDid(did)).thenReturn(Optional.of(proposal));
 
         // then
-        Throwable exception = assertThrows(GovernanceProposalStatusException.class, () -> governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, proposalId, true));
+        Throwable exception = assertThrows(GovernanceProposalStatusException.class, () -> governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, did, true));
     }
 
     @Test
     public void voteOnGovernanceProposal_successfullyUpdatesProposalStatusWhenLastVotingStakeholderVotes() {
 
         // given
-        final String proposalId = "1";
+        final UUID proposalId = UUID.randomUUID();
+        final String did = "did:5gzorro:354654621523184";
         final String votingStakeholderId = "DID";
 
         final GovernanceProposal proposal = new GovernanceProposal();
         proposal.setId(proposalId);
+        proposal.setDid(did);
         proposal.setStatus(GovernanceProposalStatus.PROPOSED);
         proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
-        when(governanceProposalRepository.findById(proposalId)).thenReturn(Optional.of(proposal));
+        when(governanceProposalRepository.findByDid(did)).thenReturn(Optional.of(proposal));
 
-        governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, proposalId, true);
+        governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, did, true);
 
         // then expect status to have been updated to approved and save called
         final GovernanceProposal updatedProposal = proposal;

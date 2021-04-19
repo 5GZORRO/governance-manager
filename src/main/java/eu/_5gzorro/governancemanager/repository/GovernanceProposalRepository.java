@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GovernanceProposalRepository extends PagingAndSortingRepository<GovernanceProposal, String>, JpaSpecificationExecutor<GovernanceProposal> {
+public interface GovernanceProposalRepository extends PagingAndSortingRepository<GovernanceProposal, UUID>, JpaSpecificationExecutor<GovernanceProposal> {
 
     List<GovernanceProposal> findBySubjectIdAndActionTypeAndStatusIn(String subjectId, GovernanceActionType actionType, Collection<GovernanceProposalStatus> statuses);
-    Optional<GovernanceProposal> findByHandle(UUID handle);
+    Optional<GovernanceProposal> findByDid(String did);
+    boolean existsByDid(String did);
+    void deleteByDid(String did);
 }

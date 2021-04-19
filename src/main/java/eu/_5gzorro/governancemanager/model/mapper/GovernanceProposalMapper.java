@@ -3,19 +3,18 @@ package eu._5gzorro.governancemanager.model.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
-import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
+import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.dto.ActionParamsDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
-import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 
 public class GovernanceProposalMapper {
 
     public static GovernanceProposalDto toGovernanceProposalDto(GovernanceProposal proposal) {
         GovernanceProposalDto dto = new GovernanceProposalDto();
-        dto.setProposalId(proposal.getId());
+        dto.setProposalId(proposal.didAssigned() ? proposal.getDid() : proposal.getId().toString());
         dto.setActionType(proposal.getActionType());
         dto.setStatus(proposal.getStatus());
         dto.setStatusUpdated(proposal.getUpdated() != null ? proposal.getUpdated() : proposal.getCreated());

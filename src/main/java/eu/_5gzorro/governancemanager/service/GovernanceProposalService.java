@@ -22,7 +22,7 @@ public interface GovernanceProposalService {
      * @param request A governance proposal request
      * @return The DID of the resulting proposal
      */
-    UUID processGovernanceProposal(String requestingStakeholderId, ProposeGovernanceDecisionRequest request);
+    UUID processGovernanceProposal(String requestingStakeholderDid, ProposeGovernanceDecisionRequest request);
 
     /**
      * Process a governance proposal. Creates a governance proposal record that is subsequently voted on.
@@ -34,21 +34,22 @@ public interface GovernanceProposalService {
     UUID processIssueCredentialRequest(IssueCredentialRequest request) throws JsonProcessingException;
 
     Page<GovernanceProposalDto> getGovernanceProposals(Pageable pageable, List<GovernanceActionType> actionTypes, List<GovernanceProposalStatus> statuses);
-    GovernanceProposalDto getGovernanceProposal(String id);
+    GovernanceProposalDto getGovernanceProposalById(UUID id);
+    GovernanceProposalDto getGovernanceProposalByDid(String did);
 
     /**
      * Process a vote cast against a proposal according to the governance model.
      * If voting threshold has been reached, then the proposal record will be updated to reflect the outcome.
-     * @param votingStakeholderId
-     * @param id
+     * @param votingStakeholderDid
+     * @param did
      * @param accept
      */
-    void voteOnGovernanceProposal(String votingStakeholderId, String id, boolean accept);
+    void voteOnGovernanceProposal(String votingStakeholderDid, String did, boolean accept);
 
     /**
-     * Replace temporary proposalHandle with issued DID
-     * @param proposalHandle
+     * Set issued DID n the proposal record - complete creation
+     * @param id
      * @param state
      */
-    void completeGovernanceProposalCreation(UUID proposalHandle, DIDStateDto state) throws IOException;
+    void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException;
 }

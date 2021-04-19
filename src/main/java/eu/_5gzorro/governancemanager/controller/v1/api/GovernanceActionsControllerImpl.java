@@ -2,8 +2,8 @@ package eu._5gzorro.governancemanager.controller.v1.api;
 
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
-import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
@@ -33,15 +33,15 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     private AuthData authData;
 
     @Override
-    public ResponseEntity<UUID> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
+    public ResponseEntity<String> proposeGovernanceDecision(@Valid ProposeGovernanceDecisionRequest request) {
 
         String requestingStakeholderId = authData.getUserId();
 
         UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(requestingStakeholderId, request);
 
         return ResponseEntity
-                .ok()
-                .body(proposalIdentifier);
+                .accepted()
+                .body(proposalIdentifier.toString());
     }
 
     @Override
@@ -56,20 +56,29 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     }
 
     @Override
-    public ResponseEntity<GovernanceProposalDto> getGovernanceProposal(@Valid String proposalId) {
+    public ResponseEntity<GovernanceProposalDto> getGovernanceProposal(@Valid String identifier) {
 
-        GovernanceProposalDto proposal = governanceProposalService.getGovernanceProposal(proposalId);
+        GovernanceProposalDto proposal;
+
+        try {
+            UUID id = UUID.fromString(identifier);
+            proposal = governanceProposalService.getGovernanceProposalById(id);
+        }
+        catch(IllegalArgumentException e) {
+            proposal = governanceProposalService.getGovernanceProposalByDid(identifier);
+        }
+
         return ResponseEntity
                 .ok()
                 .body(proposal);
     }
 
     @Override
-    public ResponseEntity voteGovernanceDecision(@Valid String proposalId, @Valid boolean accept) {
+    public ResponseEntity voteGovernanceDecision(@Valid String proposalDid, @Valid boolean accept) {
 
-        String votingStakeholderId = authData.getUserId();
+        String votingStakeholderDid = authData.getUserId();
 
-        governanceProposalService.voteOnGovernanceProposal(votingStakeholderId, proposalId, accept);
+        governanceProposalService.voteOnGovernanceProposal(votingStakeholderDid, proposalDid, accept);
 
         return ResponseEntity
                 .ok()
@@ -77,8 +86,8 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     }
 
     @Override
-    public ResponseEntity updateProposalIdentity(@Valid UUID proposalHandle, @Valid DIDStateDto state) throws IOException {
-        governanceProposalService.completeGovernanceProposalCreation(proposalHandle, state);
+    public ResponseEntity updateProposalIdentity(@Valid UUID id, @Valid DIDStateDto state) throws IOException {
+        governanceProposalService.completeGovernanceProposalCreation(id, state);
         return ResponseEntity.ok().build();
     }
 }

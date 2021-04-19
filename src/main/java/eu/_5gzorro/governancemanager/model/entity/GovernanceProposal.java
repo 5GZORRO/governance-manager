@@ -2,25 +2,29 @@ package eu._5gzorro.governancemanager.model.entity;
 
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
+import org.apache.logging.log4j.util.Strings;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "governance_proposal", indexes = {
-        @Index(name = "ix_handle", unique = true, columnList = "handle"),
+        @Index(name = "ix_did", unique = true, columnList = "did"),
         @Index(name = "ix_actionType_status", unique = false, columnList = "action_type,status")
 })
 public class GovernanceProposal {
 
     @Id
-    private String id;
+    private UUID id;
 
-    @Column(name="handle", nullable = false)
-    private UUID handle;
+    @NaturalId(mutable = true) // mutable to allow null -> did
+    @Column(name="did", nullable = true)
+    private String did;
 
     @Column(name = "proposer_id", nullable = false)
     private String proposerId;
@@ -51,20 +55,24 @@ public class GovernanceProposal {
     public GovernanceProposal() {
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public UUID getHandle() {
-        return handle;
+    public String getDid() {
+        return did;
     }
 
-    public void setHandle(UUID handle) {
-        this.handle = handle;
+    public void setDid(String did) {
+        this.did = did;
+    }
+
+    public boolean didAssigned() {
+        return Strings.isNotEmpty(did);
     }
 
     public String getProposerId() {
@@ -135,20 +143,20 @@ public class GovernanceProposal {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GovernanceProposal proposal = (GovernanceProposal) o;
-        return id.equals(proposal.id) && handle.equals(proposal.handle) && proposerId.equals(proposal.proposerId) && subjectId.equals(proposal.subjectId) && status == proposal.status && actionType == proposal.actionType;
+        GovernanceProposal that = (GovernanceProposal) o;
+        return id.equals(that.id) && Objects.equals(did, that.did) && proposerId.equals(that.proposerId) && subjectId.equals(that.subjectId) && status == that.status && actionType == that.actionType && Objects.equals(evidence, that.evidence) && Arrays.equals(issueCredentialRequest, that.issueCredentialRequest);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, handle, proposerId, subjectId, status, actionType);
+        return Objects.hash(id, did);
     }
 
     @Override
     public String toString() {
         return "GovernanceProposal{" +
                 "id='" + id + '\'' +
-                ", handle=" + handle +
+                ", did=" + did +
                 ", proposerId='" + proposerId + '\'' +
                 ", subjectId='" + subjectId + '\'' +
                 ", status=" + status +
