@@ -22,21 +22,35 @@ import javax.validation.Valid;
 @Tag(name = "Admin Agent")
 public interface AdminAgentHandlerController {
 
-    @Operation(description = "Request 5GZORRO stakeholder membership.  Request is subject to governance prior to approval.")
+    @Operation(description = "Receive a stakeholder credential request. Request is subject to governance prior to approval & issuance.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Request was submitted successfully",
+            @ApiResponse(responseCode = "202", description = "Request was accepted",
                     content = { @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "The request failed validation checks",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("stakeholder/receive")
-    ResponseEntity registerStakeholder(@Valid @RequestBody final RegisterStakeholderRequest request) throws JsonProcessingException;
+    ResponseEntity<Void> registerStakeholder(@Valid @RequestBody final RegisterStakeholderRequest request) throws JsonProcessingException;
 
 
+    @Operation(description = "Receive a credential request. Request is subject to governance prior to approval & issuance.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Request was accepted",
+                    content = { @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "The request failed validation checks",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @PostMapping("receive")
-    ResponseEntity issue(@Valid @RequestBody final IssueCredentialRequest request) throws JsonProcessingException;
+    ResponseEntity<Void> issue(@Valid @RequestBody final IssueCredentialRequest request) throws JsonProcessingException;
 
 
+    @Operation(description = "Receive a stakeholder credential revokation request. Request is subject to governance prior to approval & issuance.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Request was accepted",
+                    content = { @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "The request failed validation checks",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @DeleteMapping("receive/{credentialId}")
-    ResponseEntity revoke(@Valid @RequestParam final String credentialId);
+    ResponseEntity<Void> revoke(@Valid @RequestParam final String credentialId);
 }
