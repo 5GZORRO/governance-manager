@@ -18,3 +18,9 @@ springdoc:
 logging:
   level:
     eu._5gzorro.governancemanager.httpClient: DEBUG
+
+callbacks:
+  updateProposalIdentity: ${UPDATE_PROPOSAL_CALLBACK_URL:http://localhost:8080/api/v1/governance-actions/%s/identity}
+
+deferredExecutionQueue:
+  delay: ${DEFERRED_EXECUTION_QUEUE_DELAY:5000}
