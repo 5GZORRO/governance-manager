@@ -105,7 +105,7 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     @Override
     public UUID processIssueCredentialRequest(IssueCredentialRequest request) throws JsonProcessingException {
 
-        GovernanceProposal proposal = GovernanceProposalMapper.fromIssueCredentialRequest(authData.getUserId(), request);
+        //GovernanceProposal proposal = GovernanceProposalMapper.fromIssueCredentialRequest(authData.getUserId(), request);
 
         // TODO: Remove when start using proposals
         identityClientService.issueCredential(request);
