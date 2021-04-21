@@ -24,10 +24,13 @@ public class IssueCredentialRequest {
     @Valid
     private CredentialSubjectDto credentialSubject;
 
+    private String timestamp;
+
     @URL
     @NotBlank
     @JsonProperty("service_endpoint")
     private String serviceEndpoint;
+
 
 
     public IssueCredentialRequest() {
@@ -65,6 +68,14 @@ public class IssueCredentialRequest {
         this.credentialSubject = credentialSubject;
     }
 
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getServiceEndpoint() {
         return serviceEndpoint;
     }
@@ -78,12 +89,12 @@ public class IssueCredentialRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IssueCredentialRequest that = (IssueCredentialRequest) o;
-        return id.equals(that.id) && requestId.equals(that.requestId) && type.equals(that.type) && credentialSubject.equals(that.credentialSubject) && serviceEndpoint.equals(that.serviceEndpoint);
+        return id.equals(that.id) && requestId.equals(that.requestId) && type.equals(that.type) && credentialSubject.equals(that.credentialSubject) && Objects.equals(timestamp, that.timestamp) && serviceEndpoint.equals(that.serviceEndpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, requestId, type, credentialSubject, serviceEndpoint);
+        return Objects.hash(id, requestId, type, credentialSubject, timestamp, serviceEndpoint);
     }
 
     @Override
@@ -93,6 +104,7 @@ public class IssueCredentialRequest {
                 ", requestId='" + requestId + '\'' +
                 ", type='" + type + '\'' +
                 ", credentialSubject=" + credentialSubject +
+                ", timestamp='" + timestamp + '\'' +
                 ", serviceEndpoint='" + serviceEndpoint + '\'' +
                 '}';
     }

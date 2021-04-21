@@ -24,6 +24,8 @@ public class RegisterStakeholderRequest implements Serializable {
     @NotNull
     private StakeholderClaimDto stakeholderClaim;
 
+    private String timestamp;
+
     @URL
     @NotBlank
     @JsonProperty("service_endpoint")
@@ -56,6 +58,14 @@ public class RegisterStakeholderRequest implements Serializable {
         this.stakeholderClaim = stakeholderClaim;
     }
 
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public String getServiceEndpoint() {
         return serviceEndpoint;
     }
@@ -69,12 +79,12 @@ public class RegisterStakeholderRequest implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegisterStakeholderRequest that = (RegisterStakeholderRequest) o;
-        return id.equals(that.id) && requestId.equals(that.requestId);
+        return id.equals(that.id) && requestId.equals(that.requestId) && stakeholderClaim.equals(that.stakeholderClaim) && Objects.equals(timestamp, that.timestamp) && Objects.equals(serviceEndpoint, that.serviceEndpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, requestId);
+        return Objects.hash(id, requestId, stakeholderClaim, timestamp, serviceEndpoint);
     }
 
     @Override
@@ -83,6 +93,7 @@ public class RegisterStakeholderRequest implements Serializable {
                 "id='" + id + '\'' +
                 ", requestId='" + requestId + '\'' +
                 ", stakeholderClaim=" + stakeholderClaim +
+                ", timestamp='" + timestamp + '\'' +
                 ", serviceEndpoint='" + serviceEndpoint + '\'' +
                 '}';
     }
