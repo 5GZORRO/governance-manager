@@ -103,18 +103,6 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     }
 
     @Override
-    public UUID processIssueCredentialRequest(IssueCredentialRequest request) throws JsonProcessingException {
-
-        //GovernanceProposal proposal = GovernanceProposalMapper.fromIssueCredentialRequest(authData.getUserId(), request);
-
-        // TODO: Remove when start using proposals
-        identityClientService.issueCredential(request);
-
-        return uuidSource.newUUID(); // TODO: replace with proposal creation when ID&P ready
-        //return processGovernanceProposal(proposal);
-    }
-
-    @Override
     public Page<GovernanceProposalDto> getGovernanceProposals(Pageable pageable, List<GovernanceActionType> actionTypes, List<GovernanceProposalStatus> statuses) {
 
         Specification spec = Specification

@@ -2,6 +2,7 @@ package eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu._5gzorro.governancemanager.dto.identityPermissions.StakeholderClaimDto;
+import eu._5gzorro.governancemanager.model.enumeration.CredentialRequestType;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.Valid;
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class RegisterStakeholderRequest implements Serializable {
+public class RegisterStakeholderRequest extends CredentialRequest implements Serializable {
 
     @NotBlank
     @JsonProperty("_id")
@@ -32,6 +33,7 @@ public class RegisterStakeholderRequest implements Serializable {
     private String serviceEndpoint;
 
     public RegisterStakeholderRequest() {
+        super(CredentialRequestType.STAKEHOLDER);
     }
 
     public String getId() {
@@ -79,12 +81,12 @@ public class RegisterStakeholderRequest implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegisterStakeholderRequest that = (RegisterStakeholderRequest) o;
-        return id.equals(that.id) && requestId.equals(that.requestId) && stakeholderClaim.equals(that.stakeholderClaim) && Objects.equals(timestamp, that.timestamp) && Objects.equals(serviceEndpoint, that.serviceEndpoint);
+        return id.equals(that.id) && requestId.equals(that.requestId) && getType().equals(that.getType()) && stakeholderClaim.equals(that.stakeholderClaim) && Objects.equals(timestamp, that.timestamp) && Objects.equals(serviceEndpoint, that.serviceEndpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, requestId, stakeholderClaim, timestamp, serviceEndpoint);
+        return Objects.hash(id, requestId, getType(), stakeholderClaim, timestamp, serviceEndpoint);
     }
 
     @Override
@@ -92,6 +94,7 @@ public class RegisterStakeholderRequest implements Serializable {
         return "RegisterStakeholderRequest{" +
                 "id='" + id + '\'' +
                 ", requestId='" + requestId + '\'' +
+                ", type='" + getType() + '\'' +
                 ", stakeholderClaim=" + stakeholderClaim +
                 ", timestamp='" + timestamp + '\'' +
                 ", serviceEndpoint='" + serviceEndpoint + '\'' +

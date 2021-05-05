@@ -19,7 +19,7 @@ public interface MemberService {
      * @param request
      * @return The UUID Handle of the resulting proposal
      */
-    UUID processMembershipApplication(RegisterStakeholderRequest request) throws JsonProcessingException;
+    void processMembershipApplication(RegisterStakeholderRequest request, boolean isSubjectToGovernance) throws JsonProcessingException;
 
     Page<MemberDto> getMembers(Pageable pageable, String filterText);
     MembershipStatusDto getMemberStatus(String id);

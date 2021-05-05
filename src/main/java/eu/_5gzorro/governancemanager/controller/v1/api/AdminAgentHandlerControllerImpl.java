@@ -7,6 +7,7 @@ import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.Reg
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.service.DeferredExecutionQueue;
 import eu._5gzorro.governancemanager.service.GovernanceProposalService;
+import eu._5gzorro.governancemanager.service.GovernanceService;
 import eu._5gzorro.governancemanager.service.MemberService;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -24,11 +26,11 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
 
     private static final Logger log = LogManager.getLogger(AdminAgentHandlerControllerImpl.class);
 
-    @Autowired
-    private MemberService memberService;
+//    @Autowired
+//    private MemberService memberService;
 
     @Autowired
-    private GovernanceProposalService governanceProposalService;
+    private GovernanceService governanceService;
 
     @Autowired
     private AuthData authData;
@@ -42,10 +44,12 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
     @Override
     public ResponseEntity<Void> registerStakeholder(@Valid RegisterStakeholderRequest request) throws JsonProcessingException {
 
-        // Process business logic asynchronously to align with the expectation if ID&P
+        String requestingStakeholderId = request.getStakeholderClaim().getDid();
+
+        // Process business logic asynchronously to align with the expectation of ID&P
         deferredExecutionQueue.push(() -> {
             try {
-                UUID proposalId = memberService.processMembershipApplication(request);
+                Optional<UUID> proposalId = governanceService.processCredentialRequest(requestingStakeholderId, request); //memberService.processMembershipApplication(request);
                 log.info(String.format("Proposal created with id: %s.  Request: %s", proposalId, jsonMapper.writeValueAsString(request)));
             } catch (JsonProcessingException e) {
                 log.error(e);
@@ -60,10 +64,12 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
     @Override
     public ResponseEntity<Void> issue(@Valid IssueCredentialRequest request) throws JsonProcessingException {
 
+        String requestingStakeholderId = authData.getUserId();
+
         deferredExecutionQueue.push(() -> {
             try {
-                UUID proposalId = governanceProposalService.processIssueCredentialRequest(request);
-                log.info(String.format("Proposal created with id: %s.  Request: %s", proposalId, jsonMapper.writeValueAsString(request)));
+                Optional<UUID> proposalId = governanceService.processCredentialRequest(requestingStakeholderId, request);
+                log.info(String.format("Proposal created with id: %s. Request: %s", proposalId, jsonMapper.writeValueAsString(request)));
             } catch (JsonProcessingException e) {
                 log.error(e);
             }

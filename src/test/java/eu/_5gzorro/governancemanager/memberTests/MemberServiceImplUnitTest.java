@@ -135,11 +135,10 @@ class MemberServiceImplUnitTest {
         Mockito.when(uuidSource.newUUID()).thenReturn(mockedProposalHandle);
 
         Mockito.when(governanceProposalService.processGovernanceProposal(any(GovernanceProposal.class))).thenReturn(mockedProposalHandle);
-        UUID result = memberService.processMembershipApplication(request);
+        memberService.processMembershipApplication(request, true);
 
         // then
         verify(memberRepository, times(1)).save(expectedMember);
-        assertEquals(mockedProposalHandle, result);
     }
 
     @Test

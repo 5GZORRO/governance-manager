@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
-public class IssueCredentialRequest {
+public class IssueCredentialRequest extends CredentialRequest {
 
     @NotBlank
     @JsonProperty("_id")
@@ -17,9 +17,6 @@ public class IssueCredentialRequest {
     @NotBlank
     @JsonProperty("holder_request_id")
     private String requestId;
-
-    @NotBlank
-    private String type;
 
     @Valid
     private CredentialSubjectDto credentialSubject;
@@ -30,8 +27,6 @@ public class IssueCredentialRequest {
     @NotBlank
     @JsonProperty("service_endpoint")
     private String serviceEndpoint;
-
-
 
     public IssueCredentialRequest() {
     }
@@ -50,14 +45,6 @@ public class IssueCredentialRequest {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public CredentialSubjectDto getCredentialSubject() {
@@ -89,12 +76,12 @@ public class IssueCredentialRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         IssueCredentialRequest that = (IssueCredentialRequest) o;
-        return id.equals(that.id) && requestId.equals(that.requestId) && type.equals(that.type) && credentialSubject.equals(that.credentialSubject) && Objects.equals(timestamp, that.timestamp) && serviceEndpoint.equals(that.serviceEndpoint);
+        return id.equals(that.id) && requestId.equals(that.requestId) && getType().equals(that.getType()) && credentialSubject.equals(that.credentialSubject) && Objects.equals(timestamp, that.timestamp) && serviceEndpoint.equals(that.serviceEndpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, requestId, type, credentialSubject, timestamp, serviceEndpoint);
+        return Objects.hash(id, requestId, getType(), credentialSubject, timestamp, serviceEndpoint);
     }
 
     @Override
@@ -102,7 +89,7 @@ public class IssueCredentialRequest {
         return "IssueCredentialRequest{" +
                 "id='" + id + '\'' +
                 ", requestId='" + requestId + '\'' +
-                ", type='" + type + '\'' +
+                ", type='" + getType() + '\'' +
                 ", credentialSubject=" + credentialSubject +
                 ", timestamp='" + timestamp + '\'' +
                 ", serviceEndpoint='" + serviceEndpoint + '\'' +

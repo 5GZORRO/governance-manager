@@ -31,8 +31,6 @@ public interface GovernanceProposalService {
      */
     UUID processGovernanceProposal(GovernanceProposal proposal);
 
-    UUID processIssueCredentialRequest(IssueCredentialRequest request) throws JsonProcessingException;
-
     Page<GovernanceProposalDto> getGovernanceProposals(Pageable pageable, List<GovernanceActionType> actionTypes, List<GovernanceProposalStatus> statuses);
     GovernanceProposalDto getGovernanceProposalById(UUID id);
     GovernanceProposalDto getGovernanceProposalByDid(String did);

@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public UUID processMembershipApplication(RegisterStakeholderRequest request) throws JsonProcessingException {
+    public void processMembershipApplication(RegisterStakeholderRequest request, boolean isSubjectToGovernance) throws JsonProcessingException {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -68,25 +68,11 @@ public class MemberServiceImpl implements MemberService {
         member.setMembershipRequest(objectMapper.writeValueAsBytes(request));
         member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getStakeholderClaim().getStakeholderProfile().getNotificationMethod()));
 
-        //TODO: Remove this when proposals reinstated
-        member.setStatus(MembershipStatus.ACTIVE);
+        if (!isSubjectToGovernance) {
+          member.setStatus(MembershipStatus.ACTIVE);
+        }
 
         memberRepository.save(member);
-
-        // TODO: reinstate once we have completed intial simple integration or "immediately issue"
-//        GovernanceProposal proposal = GovernanceProposalMapper.fromNewMembershipRequest(authData.getUserId(), request);
-//        UUID proposalIdentifier = governanceProposalService.processGovernanceProposal(proposal);
-//        return proposalIdentifier;
-
-        //TODO: Remove this once we start using proposal functionality
-        try {
-            identityAndPermissionsApiClient.issueStakeholderCredential(request);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        return uuidSource.newUUID();  // return the proposal UUID here when reinstated
     }
 
     @Override
