@@ -33,7 +33,6 @@ public class GovernanceProposalRepositoryIntegrationTest {
     @Test
     public void whenStatusFilterProvided_thenReturnMatchingProposals() {
 
-
         GovernanceProposal p1 = new GovernanceProposal();
         p1.setId(UUID.randomUUID());
         p1.setDid("did:5gzorro:0123456781");
@@ -49,6 +48,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
         p2.setSubjectId("subject_1");
         p2.setStatus(GovernanceProposalStatus.APPROVED);
         p2.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
+
 
         // given
         List<GovernanceProposal> proposals = new ArrayList<GovernanceProposal>() {
@@ -93,13 +93,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
         p2.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         // given
-        List<GovernanceProposal> proposals = new ArrayList<GovernanceProposal>() {
-            {
-                add(p1);
-                add(p2);
-            }
-        };
-
+        List<GovernanceProposal> proposals = List.of(p1, p2);
         proposals.forEach(m -> entityManager.persist(m));
         entityManager.flush();
 
@@ -137,13 +131,7 @@ public class GovernanceProposalRepositoryIntegrationTest {
         p2.setCreated(LocalDateTime.now().minusDays(1));
 
         // given
-        List<GovernanceProposal> proposals = new ArrayList<GovernanceProposal>() {
-            {
-                add(p1);
-                add(p2);
-            }
-        };
-
+        List<GovernanceProposal> proposals = List.of(p1, p2);
         proposals.forEach(m -> entityManager.persist(m));
         entityManager.flush();
 

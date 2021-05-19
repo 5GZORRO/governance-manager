@@ -1,12 +1,12 @@
 package eu._5gzorro.governancemanager.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
+import eu._5gzorro.governancemanager.httpClient.requests.CreateDidRequest;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
+import eu._5gzorro.governancemanager.model.enumeration.CredentialRequestType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.DIDCreationException;
@@ -54,10 +54,15 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     private AuthData authData;
 
     @Autowired
-    private GovernanceService governanceService;
+    private CredentialManager credentialManager;
 
     @Value("${callbacks.updateProposalIdentity}")
     private String updateProposalIdentityCallbackUrl;
+
+    @Autowired
+    private ProposalVotingManager votingManager;
+
+    private final String myAuthToken = "Token";
 
     @Override
     @Transactional
@@ -87,14 +92,14 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         }
 
         UUID proposalIdentifier = uuidSource.newUUID();
+        String callbackUrl = String.format(updateProposalIdentityCallbackUrl, proposalIdentifier);
 
-        try {
-            String callbackUrl = String.format(updateProposalIdentityCallbackUrl, proposalIdentifier);
-            identityClientService.createDID(callbackUrl, authData.getAuthToken());
-        }
-        catch (Exception ex) {
-            throw new DIDCreationException(ex);
-        }
+        CreateDidRequest didRequest = new CreateDidRequest()
+                .type(CredentialRequestType.GOVERNANCE_PROPOSAL)
+                .authToken(myAuthToken)
+                .callbackUrl(callbackUrl);
+
+        identityClientService.createDID(didRequest);
 
         proposal.setId(proposalIdentifier);
         governanceProposalRepository.save(proposal);
@@ -142,34 +147,16 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
                 .orElseThrow(() -> new GovernanceProposalNotFoundException(did));
 
         if(proposal.getStatus() != GovernanceProposalStatus.PROPOSED) {
-            log.error(String.format("Attempted to vote on a proposal not in PROPOSED state with id %s.  Actual state: %s", did, proposal.getStatus()));
+            log.error(String.format("Attempted to vote on a proposal not in PROPOSED state with id %s.  Actual state: %s", proposal.getDid(), proposal.getStatus()));
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.PROPOSED, proposal.getStatus());
         }
 
-        /**
-         * TODO: Create service that performs initial version of voting business logic that encompasses:
-         */
-        // TODO: Retrieve admin board DID Doc
-        // TODO: Implement Vote (creation of VC)
-        // TODO: Determine if any more votes needed
-
-        boolean votingThresholdMet = true;
-
-        if(!votingThresholdMet)
-            return;
-
-        // TODO: Determine result
-        boolean upheld = true;
-
-        completeVotingForProposal(votingStakeholderDid, proposal, upheld);
+        votingManager.castVote(votingStakeholderDid, proposal, accept);
     }
 
     @Override
     @Transactional
     public void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException {
-
-//        if(state.getState() != DIDStateEnum.READY)
-//            return;
 
         GovernanceProposal proposal = governanceProposalRepository.findById(id)
                 .orElseThrow(() -> new GovernanceProposalNotFoundException(id.toString()));
@@ -179,32 +166,14 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
         proposal.setDid(state.getDid());
         proposal.setUpdated(LocalDateTime.now());
-
-        final boolean canIssueCredential = governanceService.canIssueCredential(proposal);
-
-        if(canIssueCredential) {
-            governanceService.issueCredential(proposal);
-            proposal.setStatus(GovernanceProposalStatus.APPROVED);
-        }
-        else {
-            proposal.setStatus(GovernanceProposalStatus.PROPOSED);
-        }
+        proposal.setStatus(GovernanceProposalStatus.PROPOSED);
 
         governanceProposalRepository.save(proposal);
     }
 
-    private void completeVotingForProposal(String votingStakeholderDid, GovernanceProposal proposal, boolean upheld) {
-
-        // TODO: Issue VC with result approved/rejected
-
-        GovernanceProposalStatus status = upheld
-                ? GovernanceProposalStatus.APPROVED
-                : GovernanceProposalStatus.REJECTED;
-
-        proposal.setStatus(status);
+    @Override
+    @Transactional
+    public void updateGovernanceProposal(GovernanceProposal proposal) {
         governanceProposalRepository.save(proposal);
-
-        // TODO: emit event for subscribing entities to deal with
-        //  e.g. MembersService to update member status when on-boarding/revocation decision has been reached
     }
 }

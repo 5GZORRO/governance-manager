@@ -1,10 +1,8 @@
 package eu._5gzorro.governancemanager.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.IssueCredentialRequest;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
-import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
@@ -50,4 +48,6 @@ public interface GovernanceProposalService {
      * @param state
      */
     void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException;
+
+    void updateGovernanceProposal(GovernanceProposal proposal);
 }

@@ -6,9 +6,7 @@ import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.Iss
 import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.service.DeferredExecutionQueue;
-import eu._5gzorro.governancemanager.service.GovernanceProposalService;
-import eu._5gzorro.governancemanager.service.GovernanceService;
-import eu._5gzorro.governancemanager.service.MemberService;
+import eu._5gzorro.governancemanager.service.CredentialManager;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerController {
@@ -30,7 +27,7 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
 //    private MemberService memberService;
 
     @Autowired
-    private GovernanceService governanceService;
+    private CredentialManager credentialManager;
 
     @Autowired
     private AuthData authData;
@@ -49,7 +46,7 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
         // Process business logic asynchronously to align with the expectation of ID&P
         deferredExecutionQueue.push(() -> {
             try {
-                Optional<UUID> proposalId = governanceService.processCredentialRequest(requestingStakeholderId, request); //memberService.processMembershipApplication(request);
+                Optional<UUID> proposalId = credentialManager.processCredentialRequest(requestingStakeholderId, request); //memberService.processMembershipApplication(request);
                 log.info(String.format("Proposal created with id: %s.  Request: %s", proposalId, jsonMapper.writeValueAsString(request)));
             } catch (JsonProcessingException e) {
                 log.error(e);
@@ -68,7 +65,7 @@ public class AdminAgentHandlerControllerImpl implements AdminAgentHandlerControl
 
         deferredExecutionQueue.push(() -> {
             try {
-                Optional<UUID> proposalId = governanceService.processCredentialRequest(requestingStakeholderId, request);
+                Optional<UUID> proposalId = credentialManager.processCredentialRequest(requestingStakeholderId, request);
                 log.info(String.format("Proposal created with id: %s. Request: %s", proposalId, jsonMapper.writeValueAsString(request)));
             } catch (JsonProcessingException e) {
                 log.error(e);

@@ -8,9 +8,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "governance_proposal", indexes = {
@@ -51,6 +49,9 @@ public class GovernanceProposal {
     @Type(type = "org.hibernate.type.BinaryType")
     @Column(name="issue_credential_request")
     private byte[] issueCredentialRequest;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "governanceProposal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GovernanceProposalVote> votes = new HashSet<>();
 
     public GovernanceProposal() {
     }
@@ -137,6 +138,11 @@ public class GovernanceProposal {
 
     public void setIssueCredentialRequest(byte[] issueCredentialRequest) {
         this.issueCredentialRequest = issueCredentialRequest;
+    }
+
+    public void addVote(GovernanceProposalVote vote) {
+        votes.add(vote);
+        vote.setGovernanceProposal(this);
     }
 
     @Override

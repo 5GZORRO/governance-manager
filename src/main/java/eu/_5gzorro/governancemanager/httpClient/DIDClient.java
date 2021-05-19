@@ -1,14 +1,16 @@
 package eu._5gzorro.governancemanager.httpClient;
 
+import eu._5gzorro.governancemanager.httpClient.requests.CreateDidRequest;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(value="didClient", url = "${integrations.identity-permissions.apiBaseUrl}")
+import java.net.URI;
+
+@FeignClient(value="didClient")
 public interface DIDClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/holder/create_did")
-    void create(@RequestParam(value="handler_url") String handlerUrl, @RequestParam(value="token") String authToken);
+    @RequestMapping(method = RequestMethod.POST, value = "/holder/create_did")
+    void create(URI apiBaseUrl, @RequestBody CreateDidRequest request);
 }

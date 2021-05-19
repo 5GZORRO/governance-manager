@@ -19,10 +19,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class SimpleGovernanceService implements GovernanceService {
+public class SimpleCredentialManager implements CredentialManager {
 
-    private static final Logger log = LogManager.getLogger(SimpleGovernanceService.class);
-    private final List<CredentialRequestType> requestsSubjectToGovernance = List.of(CredentialRequestType.STAKEHOLDER, CredentialRequestType.LEGAL_PROSE_TEMPLATE, CredentialRequestType.REGULATED_PRODUCT_OFFER);
+    private static final Logger log = LogManager.getLogger(SimpleCredentialManager.class);
+    private final List<CredentialRequestType> requestsSubjectToGovernance = List.of(
+            CredentialRequestType.STAKEHOLDER,
+            CredentialRequestType.LEGAL_PROSE_TEMPLATE,
+            CredentialRequestType.REGULATED_PRODUCT_OFFER
+    );
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -37,24 +41,22 @@ public class SimpleGovernanceService implements GovernanceService {
     private MemberService memberService;
 
     @Override
-    public boolean canIssueCredential(GovernanceProposal proposal) {
-        return true;
-    }
-
-    @Override
     public Optional<UUID> processCredentialRequest(String requestingStakeholderId, CredentialRequest request) throws JsonProcessingException {
 
         boolean isSubjectToGovernance = requestsSubjectToGovernance.contains(request.getType());
 
+        // Create member record if a stakeholder registration request
         if(request.getType().equals(CredentialRequestType.STAKEHOLDER)) {
             memberService.processMembershipApplication((RegisterStakeholderRequest) request, isSubjectToGovernance);
         }
 
+        // Create a proposal if the request is subject to governance
         if(isSubjectToGovernance) {
             GovernanceProposal proposal = GovernanceProposalMapper.fromCredentialRequest(requestingStakeholderId, request);
             return Optional.of(proposalService.processGovernanceProposal(proposal));
         }
 
+        // If no governance, then issue the credential
         issueCredential(request);
         return Optional.empty();
     }

@@ -75,7 +75,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     @ExceptionHandler({
-            DIDCreationException.class
+            DIDCreationException.class,
+            CredentialIssuanceException.class
     })
     @ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody

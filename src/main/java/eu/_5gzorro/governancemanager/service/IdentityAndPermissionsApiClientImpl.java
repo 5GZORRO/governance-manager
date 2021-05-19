@@ -4,21 +4,56 @@ import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.Iss
 import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.httpClient.CredentialClient;
 import eu._5gzorro.governancemanager.httpClient.DIDClient;
+import eu._5gzorro.governancemanager.httpClient.requests.CreateDidRequest;
+import eu._5gzorro.governancemanager.model.exception.DIDCreationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+
 @Service
 public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissionsApiClient {
+
+    private static final Logger log = LogManager.getLogger(IdentityAndPermissionsApiClientImpl.class);
 
     @Autowired
     private DIDClient didClient;
 
     @Autowired
     private CredentialClient credentialClient;
+    
+    @Autowired
+    private AdminAgentLocator adminAgentLocator;
+
+    private String authToken = "";//TODO - grab from ID&P?
 
     @Override
-    public void createDID(String handlerUrl, String authToken) {
-        didClient.create(handlerUrl, authToken);
+    public void createDID(CreateDidRequest request) {
+
+        try {
+            request.authToken(authToken);
+            URI adminAgentBaseUrl = new URI(adminAgentLocator.getAdminAgentBaseUrl());
+            didClient.create(adminAgentBaseUrl, request);
+        }
+        catch(Exception ex) {
+            log.error("Error creating DID", ex);
+            throw new DIDCreationException(ex);
+        }
+    }
+
+    @Override
+    public void createDID(CreateDidRequest request, String issuerStakeholderDid) {
+        try {
+            request.authToken(authToken);
+            URI adminAgentBaseUrl = new URI(adminAgentLocator.getAdminAgentBaseUrl(issuerStakeholderDid));
+            didClient.create(adminAgentBaseUrl, request);
+        }
+        catch(Exception ex) {
+            log.error("Error creating DID", ex);
+            throw new DIDCreationException(ex);
+        }
     }
 
     @Override

@@ -18,10 +18,11 @@ springdoc:
 
 integrations:
   identity-permissions:
-    apiBaseUrl: ${IDENTITY_BASE_URL:http://localhost:6200}
+    myAgentBaseUrl: ${IDENTITY_BASE_URL:http://localhost:6200}
 
 callbacks:
   updateProposalIdentity: ${UPDATE_PROPOSAL_CALLBACK_URL:http://localhost:8080/api/v1/governance-actions/%s/identity}
+  updateVoteIdentity: ${UPDATE_PROPOSAL_CALLBACK_URL:http://localhost:8080/api/v1/governance-actions/%s/votes/%s/identity}
 
 deferredExecutionQueue:
   delay: ${DEFERRED_EXECUTION_QUEUE_DELAY:5000}

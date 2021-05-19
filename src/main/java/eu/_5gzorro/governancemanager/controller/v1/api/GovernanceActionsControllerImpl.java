@@ -8,6 +8,7 @@ import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.service.GovernanceProposalService;
+import eu._5gzorro.governancemanager.service.ProposalVotingManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
 
     @Autowired
     private GovernanceProposalService governanceProposalService;
+
+    @Autowired
+    private ProposalVotingManager voteManager;
 
     @Autowired
     private AuthData authData;
@@ -88,6 +92,12 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
     @Override
     public ResponseEntity updateProposalIdentity(@Valid UUID id, @Valid DIDStateDto state) throws IOException {
         governanceProposalService.completeGovernanceProposalCreation(id, state);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity updateVoteIdentity(UUID proposalId, UUID voteId, DIDStateDto state) throws IOException {
+        voteManager.completeVoteCreation(proposalId, voteId, state);
         return ResponseEntity.ok().build();
     }
 }

@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GovernanceService {
+public interface CredentialManager {
     Optional<UUID> processCredentialRequest(String requestingStakeholderId, CredentialRequest request) throws JsonProcessingException;
-    boolean canIssueCredential(GovernanceProposal proposal);
     void issueCredential(GovernanceProposal proposal) throws IOException;
-
 }

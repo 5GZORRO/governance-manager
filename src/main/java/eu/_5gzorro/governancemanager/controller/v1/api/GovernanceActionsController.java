@@ -91,4 +91,17 @@ public interface GovernanceActionsController {
     })
     @PutMapping("{id}/identity")
     ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID id, @Valid @RequestBody final DIDStateDto state) throws IOException;
+
+
+    @Operation(description = "Callback endpoint to handle process async DID identifier generation", tags= { "Governance - Admin Only" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vote DID assigned successfully",
+                    content = { @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Invalid identifier provided",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "A proposal or vote with the specified Id was not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PutMapping("{proposalId}/votes/{voteId}/identity")
+    ResponseEntity updateVoteIdentity(@Valid @PathVariable final UUID proposalId, @Valid @PathVariable final UUID voteId, @Valid @RequestBody final DIDStateDto state) throws IOException;
 }
