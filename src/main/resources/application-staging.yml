@@ -24,3 +24,6 @@ callbacks:
 
 deferredExecutionQueue:
   delay: ${DEFERRED_EXECUTION_QUEUE_DELAY:5000}
+
+server:
+  forward-headers-strategy: framework
