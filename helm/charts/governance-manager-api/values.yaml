@@ -1,7 +1,3 @@
-identityBaseUrl: "http://172.28.3.153:6200"
-callbacks:
-    updateProposal: "http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
-
 fullnameOverride: "governance-manager-app"
 
 serviceAccount:
@@ -13,7 +9,6 @@ serviceAccount:
 
 replicaCount: 1
 service:
-    prefix: /operatora/governance
     name: governance-manager-app
     type: ClusterIP
     appPort: 8080
@@ -39,7 +34,6 @@ imagePullSecrets:
 postgres:
     host: postgresql.postgres.svc.cluster.local
     port: 5432
-    name: operator_a_governance
 
 probePath: /actuator/health
 
