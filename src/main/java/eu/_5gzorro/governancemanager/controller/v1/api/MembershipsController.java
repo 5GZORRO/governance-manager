@@ -39,6 +39,18 @@ public interface MembershipsController {
     @GetMapping("{stakeholderId}/status")
     ResponseEntity<MembershipStatusDto> checkMembershipStatus(@Valid @PathVariable final String stakeholderId);
 
+    @Operation(description = "Get a 5GZORRO stakeholder's DLT identity")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns a string containing the stakeholder's DLT identity for the provided DID",
+                    content = { @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Invalid DID provided",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "A member with the specified Stakeholder DID was not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("{stakeholderDid}/ledger-identity")
+    ResponseEntity<String> getLedgerIdentity(@Valid @PathVariable final String stakeholderDid);
+
     @Operation(description = "Retrieve a paged collection of 5GZORRO member stakeholders according to paging and filter parameters")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "A Paged List of Member records",

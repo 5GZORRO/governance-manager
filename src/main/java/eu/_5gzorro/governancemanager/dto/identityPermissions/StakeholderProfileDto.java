@@ -11,6 +11,8 @@ public class StakeholderProfileDto {
 
     @NotBlank
     private String name;
+    @NotBlank
+    private String ledgerIdentity;
     private String address;
 
     @NotNull
@@ -26,6 +28,14 @@ public class StakeholderProfileDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLedgerIdentity() {
+        return ledgerIdentity;
+    }
+
+    public void setLedgerIdentity(String ledgerIdentity) {
+        this.ledgerIdentity = ledgerIdentity;
     }
 
     public String getAddress() {
@@ -49,18 +59,19 @@ public class StakeholderProfileDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StakeholderProfileDto that = (StakeholderProfileDto) o;
-        return name.equals(that.name) && address.equals(that.address) && Objects.equals(notificationMethod, that.notificationMethod);
+        return name.equals(that.name) && ledgerIdentity.equals(that.ledgerIdentity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, address, notificationMethod);
+        return Objects.hash(name, ledgerIdentity);
     }
 
     @Override
     public String toString() {
         return "StakeholderProfileDto{" +
                 "name='" + name + '\'' +
+                ", ledgerIdentity='" + ledgerIdentity + '\'' +
                 ", address='" + address + '\'' +
                 ", notificationMethod=" + notificationMethod +
                 '}';

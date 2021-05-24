@@ -5,6 +5,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,6 +23,9 @@ public class Member {
     private String legalName;
 
     private String address;
+
+    @Column(name="ledger_identity")
+    private String ledgerIdentity;
 
     @Column(name="status", nullable = false)
     private MembershipStatus status = MembershipStatus.PENDING;
@@ -42,9 +46,10 @@ public class Member {
     public Member() {
     }
 
-    public Member(String id, String legalName) {
+    public Member(String id, String legalName, String ledgerIdentity) {
         this.id = id;
         this.legalName = legalName;
+        this.ledgerIdentity = ledgerIdentity;
     }
 
     public String getId() {
@@ -61,6 +66,14 @@ public class Member {
 
     public void setLegalName(String legalName) {
         this.legalName = legalName;
+    }
+
+    public String getLedgerIdentity() {
+        return ledgerIdentity;
+    }
+
+    public void setLedgerIdentity(String ledgerIdentity) {
+        this.ledgerIdentity = ledgerIdentity;
     }
 
     public String getAddress() {
@@ -135,7 +148,7 @@ public class Member {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Member member = (Member) o;
-        return id.equals(member.id);
+        return id.equals(member.id) && legalName.equals(member.legalName);
     }
 
     @Override
@@ -149,7 +162,10 @@ public class Member {
                 "id='" + id + '\'' +
                 ", legalName='" + legalName + '\'' +
                 ", address='" + address + '\'' +
+                ", ledgerIdentity='" + ledgerIdentity + '\'' +
                 ", status=" + status +
+                ", notificationSettings=" + notificationSettings +
+                ", membershipRequest=" + Arrays.toString(membershipRequest) +
                 ", created=" + created +
                 ", updated=" + updated +
                 ", archived=" + archived +

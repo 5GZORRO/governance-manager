@@ -23,5 +23,6 @@ public interface MemberService {
 
     Page<MemberDto> getMembers(Pageable pageable, String filterText);
     MembershipStatusDto getMemberStatus(String id);
+    MemberDto getMember(String id);
     Optional<UUID> revokeMembership(String requestingStakeholderId, String subjectId);
 }

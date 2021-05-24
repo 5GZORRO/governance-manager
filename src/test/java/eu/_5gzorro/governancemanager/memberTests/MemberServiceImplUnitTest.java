@@ -83,7 +83,7 @@ class MemberServiceImplUnitTest {
         expectedMemberDto.setStakeholderId("1");
 
         // when
-        Member member = new Member("1", "Telefonica");
+        Member member = new Member("1", "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.PENDING);
         Page expectedMemberPage = new PageImpl(List.of(member));
 
@@ -103,7 +103,7 @@ class MemberServiceImplUnitTest {
 
         UUID mockedProposalHandle = UUID.randomUUID();
         String mockedStakeholderDid = "did:5gzorro:1234567890";
-        Member expectedMember = new Member(mockedStakeholderDid, "Telefonica");
+        Member expectedMember = new Member(mockedStakeholderDid, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         expectedMember.setStatus(MembershipStatus.PENDING);
 
         MemberNotificationSetting setting = new MemberNotificationSetting()
@@ -151,7 +151,7 @@ class MemberServiceImplUnitTest {
         expectedMember.setStatus(MembershipStatus.PENDING);
 
         // given
-        Member member = new Member(stakeholderId, "Telefonica");
+        Member member = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.PENDING);
 
         when(memberRepository.findById(stakeholderId)).thenReturn(Optional.of(member));
@@ -166,6 +166,40 @@ class MemberServiceImplUnitTest {
 
     @Test
     void getMemberStatus_throwsMemberNotFoundExceptionWhenMemberNotFound() {
+
+        // given
+        final String stakeholderId = "1";
+        when(memberRepository.findById(stakeholderId)).thenReturn(Optional.empty());
+
+        // then
+        Throwable exception = assertThrows(MemberNotFoundException.class, () -> memberService.getMemberStatus(stakeholderId));
+    }
+
+    @Test
+    void getMember_returnsMember() {
+
+        final String stakeholderId = "1";
+        MemberDto expectedMember = new MemberDto();
+        expectedMember.setStakeholderId(stakeholderId);
+        expectedMember.setLegalName("Telefonica");
+        expectedMember.setLedgerIdentity("O=OperatorA,OU=Manchester,L=Manchester,C=UK");
+
+        // given
+        Member member = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
+        member.setStatus(MembershipStatus.PENDING);
+
+        when(memberRepository.findById(stakeholderId)).thenReturn(Optional.of(member));
+
+        // when
+        MemberDto result = memberService.getMember(stakeholderId);
+
+        // then
+        verify(memberRepository, times(1)).findById(stakeholderId);
+        assertEquals(expectedMember, result);
+    }
+
+    @Test
+    void getMember_throwsMemberNotFoundExceptionWhenMemberNotFound() {
 
         // given
         final String stakeholderId = "1";
@@ -206,7 +240,7 @@ class MemberServiceImplUnitTest {
         final String requestingStakeholderId = "1";
         final String stakeholderId = "1";
 
-        Member member = new Member(stakeholderId, "Telefonica");
+        Member member = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.ACTIVE);
 
         when(memberRepository.findById(stakeholderId)).thenReturn(Optional.of(member));
@@ -214,7 +248,7 @@ class MemberServiceImplUnitTest {
         Optional<UUID> generatedProposalId = memberService.revokeMembership(requestingStakeholderId, stakeholderId);
 
         // The expected updated state of the member after calling revoke
-        Member updatedMember = new Member(stakeholderId, "Telefonica");
+        Member updatedMember = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.REVOKED);
 
         // then
@@ -228,7 +262,7 @@ class MemberServiceImplUnitTest {
         // given
         final String requestingStakeholderId = "2";
         final String stakeholderId = "1";
-        Member member = new Member(stakeholderId, "Telefonica");
+        Member member = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.PENDING);
 
         when(memberRepository.findById(stakeholderId)).thenReturn(Optional.of(member));
@@ -245,7 +279,7 @@ class MemberServiceImplUnitTest {
         final String requestingStakeholderId = "2";
         final String stakeholderId = "1";
 
-        Member member = new Member(stakeholderId, "Telefonica");
+        Member member = new Member(stakeholderId, "Telefonica", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         member.setStatus(MembershipStatus.ACTIVE);
 
         when(memberRepository.findById(stakeholderId)).thenReturn(Optional.of(member));
