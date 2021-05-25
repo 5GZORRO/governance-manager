@@ -41,6 +41,7 @@ jobs:
     - name: Deploy Governance API for operatorA
       run: |
           helm upgrade governance-api ./helm/charts/governance-manager-api/ \
+            --install \
             --namespace operatora-ns \
             --repo ./helm/charts/governance-manager-api/ \
             --values ./helm/charts/governance-manager-api/values.yaml \
@@ -54,6 +55,7 @@ jobs:
     - name: Deploy Governance API for regulatorA
       run: |
         helm upgrade governance-api ./helm/charts/governance-manager-api/ \
+          --install \
           --namespace regulatora-ns \
           --repo ./helm/charts/governance-manager-api/ \
           --values ./helm/charts/governance-manager-api/values.yaml \
