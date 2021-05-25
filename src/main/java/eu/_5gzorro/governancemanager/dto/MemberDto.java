@@ -7,6 +7,7 @@ public class MemberDto {
     private String id;
     private String legalName;
     private String address;
+    private String ledgerIdentity;
 
     public MemberDto() {
     }
@@ -35,6 +36,14 @@ public class MemberDto {
         this.address = address;
     }
 
+    public String getLedgerIdentity() {
+        return ledgerIdentity;
+    }
+
+    public void setLedgerIdentity(String ledgerIdentity) {
+        this.ledgerIdentity = ledgerIdentity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,6 +63,7 @@ public class MemberDto {
                 "id='" + id + '\'' +
                 ", legalName='" + legalName + '\'' +
                 ", address='" + address + '\'' +
+                ", ledgerIdentity='" + ledgerIdentity + '\'' +
                 '}';
     }
 }

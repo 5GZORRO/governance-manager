@@ -39,6 +39,16 @@ public class MembershipsControllerImpl implements MembershipsController {
     }
 
     @Override
+    public ResponseEntity<String> getLedgerIdentity(String stakeholderDid) {
+
+        MemberDto member = memberService.getMember(stakeholderDid);
+
+        return ResponseEntity
+                .ok()
+                .body(member.getLedgerIdentity());
+    }
+
+    @Override
     public ResponseEntity<PagedMembersResponse> getMembers(Pageable pageable, String filterText) {
 
         Page<MemberDto> page = memberService.getMembers(pageable, filterText);

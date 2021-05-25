@@ -63,7 +63,11 @@ public class MemberServiceImpl implements MemberService {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Member member = new Member(request.getStakeholderClaim().getDid(), request.getStakeholderClaim().getStakeholderProfile().getName());
+        Member member = new Member(
+                request.getStakeholderClaim().getDid(),
+                request.getStakeholderClaim().getStakeholderProfile().getName(),
+                request.getStakeholderClaim().getStakeholderProfile().getLedgerIdentity());
+
         member.setAddress(request.getStakeholderClaim().getStakeholderProfile().getAddress());
         member.setMembershipRequest(objectMapper.writeValueAsBytes(request));
         member.addNotificationSettings(MemberNotificationSettingsMapper.toMemberNotificationSettings(request.getStakeholderClaim().getStakeholderProfile().getNotificationMethod()));
@@ -102,6 +106,14 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(id));
 
         return MemberMapper.toMembershipStatusDto(member);
+    }
+
+    @Override
+    public MemberDto getMember(String id) {
+        Member member =  memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException(id));
+
+        return mapper.map(member, MemberDto.class);
     }
 
     @Override

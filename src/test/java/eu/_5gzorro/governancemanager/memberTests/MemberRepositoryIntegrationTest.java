@@ -27,13 +27,14 @@ public class MemberRepositoryIntegrationTest {
 
     @Test
     public void whenFindByLegalName_thenReturnMatchingMembers() {
-        Member bt = new Member("1", "BT");
+
+        Member bt = new Member("1", "BT", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         bt.setStatus(MembershipStatus.PENDING);
 
-        Member telefonica = new Member("2", "Telefonica");
+        Member telefonica = new Member("2", "Telefonica", "O=OperatorB,OU=Zurich,L=Zurich,C=CH");
         telefonica.setStatus(MembershipStatus.PENDING);
 
-        Member orange = new Member("3", "Orange");
+        Member orange = new Member("3", "Orange", "O=OperatorC,OU=Paris,L=Paris,C=FR");
         orange.setStatus(MembershipStatus.PENDING);
 
         // given
@@ -60,13 +61,14 @@ public class MemberRepositoryIntegrationTest {
 
     @Test
     public void whenFindByLegalNameDoesntMatchAny_thenReturnNoMembers() {
-        Member bt = new Member("1", "BT");
+
+        Member bt = new Member("1", "BT", "O=OperatorA,OU=Manchester,L=Manchester,C=UK");
         bt.setStatus(MembershipStatus.PENDING);
 
-        Member telefonica = new Member("2", "Telefonica");
+        Member telefonica = new Member("2", "Telefonica", "O=OperatorB,OU=Zurich,L=Zurich,C=CH");
         telefonica.setStatus(MembershipStatus.PENDING);
 
-        Member orange = new Member("3", "Orange");
+        Member orange = new Member("3", "Orange", "O=OperatorC,OU=Paris,L=Paris,C=FR");
         orange.setStatus(MembershipStatus.PENDING);
 
         // given

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 
-@RequestMapping("/api/v1/admin-agent-handler/handler_admin")
+@RequestMapping("/api/v1/admin-agent-handler")
 @Validated
 @Tag(name = "Admin Agent")
 public interface AdminAgentHandlerController {
