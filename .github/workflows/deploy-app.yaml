@@ -22,11 +22,31 @@ jobs:
         config_file: .github/vpn/config.ovpn
         username: ${{ secrets.OVPN_USERNAME }}
         password: ${{ secrets.OVPN_PASSWORD }}
-    - name: Deploy to K8s cluster
+    - name: Deploy Governance API for operatorA
       run: |
-          helm upgrade governance-api ./helm/charts/governance-manager-api/ \
-            --namespace operatora-ns \
-            --repo ./helm/charts/governance-manager-api/ \
-            --values ./helm/charts/governance-manager-api/values.yaml \
-            --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
-            --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }}
+        helm upgrade governance-api ./helm/charts/governance-manager-api/ \
+        --install \
+        --namespace operatora-ns \
+        --repo ./helm/charts/governance-manager-api/ \
+        --values ./helm/charts/governance-manager-api/values.yaml \
+        --set dockerTag=${{ env.RELEASE_VERSION }} \
+        --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
+        --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
+        --set postgres.name=operator_a_governance \
+        --set service.prefix=/operatora/governance \
+        --set identityBaseUrl="http://172.28.3.153:6200" \
+        --set callbacks.updateProposal="http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
+    - name: Deploy Governance API for regulatorA
+      run: |
+        helm upgrade governance-api ./helm/charts/governance-manager-api/ \
+          --install \
+          --namespace regulatora-ns \
+          --repo ./helm/charts/governance-manager-api/ \
+          --values ./helm/charts/governance-manager-api/values.yaml \
+          --set dockerTag=${{ env.RELEASE_VERSION }} \
+          --set postgres.username=${{ secrets.OPERATORA_POSTGRES_USERNAME }} \
+          --set postgres.password=${{ secrets.OPERATORA_POSTGRES_PASSWORD }} \
+          --set postgres.name=operator_a_governance \
+          --set service.prefix=/regulatora/governance \
+          --set identityBaseUrl="http://172.28.3.153:6300" \
+          --set callbacks.updateProposal="http://172.28.3.111/regulatora/governance/api/v1/governance-actions/%s/identity"
