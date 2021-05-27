@@ -11,8 +11,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-
 @Service
 public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissionsApiClient {
 
@@ -23,9 +21,6 @@ public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissio
 
     @Autowired
     private CredentialClient credentialClient;
-    
-    @Autowired
-    private AdminAgentLocator adminAgentLocator;
 
     private String authToken = "";//TODO - grab from ID&P?
 
@@ -34,8 +29,7 @@ public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissio
 
         try {
             request.authToken(authToken);
-            URI adminAgentBaseUrl = new URI(adminAgentLocator.getAdminAgentBaseUrl());
-            didClient.create(adminAgentBaseUrl, request);
+            didClient.create(request);
         }
         catch(Exception ex) {
             log.error("Error creating DID", ex);
@@ -47,8 +41,7 @@ public class IdentityAndPermissionsApiClientImpl implements IdentityAndPermissio
     public void createDID(CreateDidRequest request, String issuerStakeholderDid) {
         try {
             request.authToken(authToken);
-            URI adminAgentBaseUrl = new URI(adminAgentLocator.getAdminAgentBaseUrl(issuerStakeholderDid));
-            didClient.create(adminAgentBaseUrl, request);
+            didClient.create(request);
         }
         catch(Exception ex) {
             log.error("Error creating DID", ex);

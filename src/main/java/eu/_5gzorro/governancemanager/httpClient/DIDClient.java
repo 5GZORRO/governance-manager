@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.net.URI;
 
-@FeignClient(value="didClient")
+@FeignClient(value="didClient", url = "${integrations.identity-permissions.myAgentBaseUrl}")
 public interface DIDClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/holder/create_did")
-    void create(URI apiBaseUrl, @RequestBody CreateDidRequest request);
+    void create(@RequestBody CreateDidRequest request);
 }
