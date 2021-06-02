@@ -24,3 +24,7 @@ callbacks:
 
 deferredExecutionQueue:
   delay: ${DEFERRED_EXECUTION_QUEUE_DELAY:5000}
+
+integrations:
+  identity-permissions:
+    myAgentBaseUrl: ${IDENTITY_BASE_URL:http://localhost:6200}

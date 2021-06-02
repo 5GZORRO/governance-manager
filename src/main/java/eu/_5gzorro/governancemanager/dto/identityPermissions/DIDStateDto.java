@@ -1,12 +1,9 @@
 package eu._5gzorro.governancemanager.dto.identityPermissions;
 
-import eu._5gzorro.governancemanager.dto.identityPermissions.enumeration.DIDStateEnum;
-
 import java.util.Objects;
 
 public class DIDStateDto {
     private String did;
-//    private DIDStateEnum state;
     private String state;
 
     public DIDStateDto() {
@@ -19,15 +16,6 @@ public class DIDStateDto {
     public void setDid(String did) {
         this.did = did;
     }
-
-//    public DIDStateEnum getState() {
-//        return state;
-//    }
-//
-//    public void setState(DIDStateEnum state) {
-//        this.state = state;
-//    }
-
 
     public String getState() {
         return state;

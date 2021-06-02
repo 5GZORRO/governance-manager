@@ -5,8 +5,9 @@ import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.Iss
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
-import eu._5gzorro.governancemanager.model.AuthData;
+import eu._5gzorro.governancemanager.httpClient.requests.CreateDidRequest;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
+import eu._5gzorro.governancemanager.model.enumeration.CredentialRequestType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.DIDCreationException;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,9 +51,6 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
     @Autowired
     private ModelMapper mapper;
-
-    @Autowired
-    private AuthData authData;
 
     @Autowired
     private GovernanceService governanceService;
@@ -90,7 +89,11 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
         try {
             String callbackUrl = String.format(updateProposalIdentityCallbackUrl, proposalIdentifier);
-            identityClientService.createDID(callbackUrl, authData.getAuthToken());
+            CreateDidRequest didRequest = new CreateDidRequest()
+                    .callbackUrl(callbackUrl)
+                    .claims(Collections.emptyList())
+                    .type(CredentialRequestType.GovernanceProposal);
+            identityClientService.createDID(didRequest);
         }
         catch (Exception ex) {
             throw new DIDCreationException(ex);

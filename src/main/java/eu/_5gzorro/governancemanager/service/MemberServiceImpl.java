@@ -5,18 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu._5gzorro.governancemanager.controller.v1.request.adminAgentHandler.RegisterStakeholderRequest;
 import eu._5gzorro.governancemanager.dto.MemberDto;
 import eu._5gzorro.governancemanager.dto.MembershipStatusDto;
-import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
-import eu._5gzorro.governancemanager.dto.identityPermissions.enumeration.DIDStateEnum;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
-import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
-import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
-import eu._5gzorro.governancemanager.model.mapper.GovernanceProposalMapper;
-import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
-import eu._5gzorro.governancemanager.model.mapper.MemberNotificationSettingsMapper;
 import eu._5gzorro.governancemanager.model.entity.Member;
+import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.MembershipStatus;
 import eu._5gzorro.governancemanager.model.exception.MemberNotFoundException;
+import eu._5gzorro.governancemanager.model.exception.MemberStatusException;
+import eu._5gzorro.governancemanager.model.mapper.MemberMapper;
+import eu._5gzorro.governancemanager.model.mapper.MemberNotificationSettingsMapper;
 import eu._5gzorro.governancemanager.repository.MemberRepository;
 import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +28,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import org.apache.commons.lang.SerializationUtils;
 
 @Service
 public class MemberServiceImpl implements MemberService {

@@ -5,8 +5,9 @@ import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.Pro
 import eu._5gzorro.governancemanager.dto.ActionParamsDto;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
 import eu._5gzorro.governancemanager.dto.MemberDto;
-import eu._5gzorro.governancemanager.model.AuthData;
+import eu._5gzorro.governancemanager.httpClient.requests.CreateDidRequest;
 import eu._5gzorro.governancemanager.model.entity.GovernanceProposal;
+import eu._5gzorro.governancemanager.model.enumeration.CredentialRequestType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
@@ -19,7 +20,6 @@ import eu._5gzorro.governancemanager.service.IdentityAndPermissionsApiClient;
 import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -34,10 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -68,9 +65,6 @@ public class GovernanceProposalServiceImplUnitTest {
     private IdentityAndPermissionsApiClient identityClientService;
 
     @MockBean
-    private AuthData authData;
-
-    @MockBean
     private UuidSource uuidSource;
 
     @Test
@@ -98,15 +92,19 @@ public class GovernanceProposalServiceImplUnitTest {
         request.setActionParams(actionParams);
 
         // when
-        Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
         Mockito.when(uuidSource.newUUID()).thenReturn(expectedId);
 
         UUID result = governanceProposalService.processGovernanceProposal(stakeholderId, request);
 
         // then
         String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", expectedId);
+        CreateDidRequest didRequest = new CreateDidRequest()
+                .callbackUrl(expectedCalbackUrl)
+                .claims(Collections.emptyList())
+                .type(CredentialRequestType.GovernanceProposal);
+
         verify(governanceProposalRepository, times(1)).save(expectedProposal);
-        verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
+        verify(identityClientService, times(1)).createDID(didRequest);
         assertEquals(expectedId, result);
     }
 
@@ -125,7 +123,6 @@ public class GovernanceProposalServiceImplUnitTest {
         proposal.setActionType(GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE);
 
         // when
-        Mockito.when(authData.getAuthToken()).thenReturn(mockedAuthToken);
         Mockito.when(uuidSource.newUUID()).thenReturn(expectedId);
 
         UUID result = governanceProposalService.processGovernanceProposal(proposal);
@@ -134,7 +131,12 @@ public class GovernanceProposalServiceImplUnitTest {
         verify(governanceProposalRepository, times(1)).save(proposal);
 
         String expectedCalbackUrl = String.format("http://localhost:8080/api/v1/governance-actions/%s/identity", expectedId);
-        verify(identityClientService, times(1)).createDID(expectedCalbackUrl, mockedAuthToken);
+        CreateDidRequest didRequest = new CreateDidRequest()
+                .callbackUrl(expectedCalbackUrl)
+                .claims(Collections.emptyList())
+                .type(CredentialRequestType.GovernanceProposal);
+
+        verify(identityClientService, times(1)).createDID(didRequest);
         assertEquals(expectedId, result);
     }
 

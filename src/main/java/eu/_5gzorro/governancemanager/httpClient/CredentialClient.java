@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(value="credentialClient", url = "${integrations.identity-permissions.apiBaseUrl}")
+@FeignClient(value="credentialClient", url = "${integrations.identity-permissions.myAgentBaseUrl}")
 public interface CredentialClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/issuer/issue_stakeholder/{_id}")
