@@ -13,10 +13,7 @@ import eu._5gzorro.governancemanager.model.enumeration.GovernanceProposalStatus;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalNotFoundException;
 import eu._5gzorro.governancemanager.model.exception.GovernanceProposalStatusException;
 import eu._5gzorro.governancemanager.repository.GovernanceProposalRepository;
-import eu._5gzorro.governancemanager.service.GovernanceProposalService;
-import eu._5gzorro.governancemanager.service.GovernanceProposalServiceImpl;
-import eu._5gzorro.governancemanager.service.GovernanceService;
-import eu._5gzorro.governancemanager.service.IdentityAndPermissionsApiClient;
+import eu._5gzorro.governancemanager.service.*;
 import eu._5gzorro.governancemanager.utils.UuidSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,6 +60,9 @@ public class GovernanceProposalServiceImplUnitTest {
 
     @MockBean
     private IdentityAndPermissionsApiClient identityClientService;
+
+    @MockBean
+    private LegalProseRepositoryApiClient lprClientService;
 
     @MockBean
     private UuidSource uuidSource;
