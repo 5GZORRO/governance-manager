@@ -47,6 +47,9 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     private IdentityAndPermissionsApiClient identityClientService;
 
     @Autowired
+    private LegalProseRepositoryApiClient lprClientService;
+
+    @Autowired
     private GovernanceProposalRepository governanceProposalRepository;
 
     @Autowired
@@ -183,9 +186,6 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
     @Transactional
     public void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException {
 
-//        if(state.getState() != DIDStateEnum.READY)
-//            return;
-
         GovernanceProposal proposal = governanceProposalRepository.findById(id)
                 .orElseThrow(() -> new GovernanceProposalNotFoundException(id.toString()));
 
@@ -198,8 +198,14 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         final boolean canIssueCredential = governanceService.canIssueCredential(proposal);
 
         if(canIssueCredential) {
-            governanceService.issueCredential(proposal);
+            //governanceService.issueCredential(proposal);  // Don't issue proposal credential for now as we need to deal with voting etx. SEE VOTING BRANCH FOR WIP
             proposal.setStatus(GovernanceProposalStatus.APPROVED);
+
+            //Temporary -> issue command to LPR to approve template requests
+            // This should be refactored to occur when voting has been completed
+            if(proposal.getActionType() == GovernanceActionType.NEW_LEGAL_PROSE_TEMPLATE) {
+                lprClientService.setTemplateApprovalStatus(proposal.getSubjectId(), true); // always approving currently
+            }
         }
         else {
             proposal.setStatus(GovernanceProposalStatus.PROPOSED);

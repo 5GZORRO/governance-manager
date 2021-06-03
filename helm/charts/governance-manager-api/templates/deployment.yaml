@@ -43,6 +43,8 @@ spec:
           value: "{{ .Values.postgres.port }}"
         - name: IDENTITY_BASE_URL
           value: {{ .Values.identityBaseUrl }}
+        - name: LEGAL_PROSE_REPO_BASE_URL
+          value: {{ .Values.legalProseRepositoryBaseUrl }}
         - name: UPDATE_PROPOSAL_CALLBACK_URL
           value: {{ .Values.callbacks.updateProposal }}
         - name: POSTGRES_DB_USER

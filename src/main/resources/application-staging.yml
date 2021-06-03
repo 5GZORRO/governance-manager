@@ -18,6 +18,8 @@ springdoc:
 integrations:
   identity-permissions:
     myAgentBaseUrl: ${IDENTITY_BASE_URL:http://localhost:6200/}
+  legal-prose-repository:
+    apiBaseUrl: ${LEGAL_PROSE_REPO_BASE_URL:http://localhost:8081/api/v1}
 
 callbacks:
   updateProposalIdentity: ${UPDATE_PROPOSAL_CALLBACK_URL:http://localhost:8080/api/v1/governance-actions/%s/identity}

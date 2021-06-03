@@ -51,6 +51,7 @@ jobs:
           --set postgres.name=operator_a_governance \
           --set service.prefix=/operatora/governance \
           --set identityBaseUrl="http://172.28.3.153:6200" \
+          --set legalProseRepositoryBaseUrl="http://172.28.3.111/operatora/legal-prose-repository/api/v1" \
           --set callbacks.updateProposal="http://172.28.3.111/operatora/governance/api/v1/governance-actions/%s/identity"
     - name: Deploy Governance API for regulatorA
       run: |
@@ -65,4 +66,5 @@ jobs:
           --set postgres.name=operator_a_governance \
           --set service.prefix=/regulatora/governance \
           --set identityBaseUrl="http://172.28.3.153:6300" \
+          --set legalProseRepositoryBaseUrl="http://172.28.3.111/regulatora/legal-prose-repository/api/v1" \
           --set callbacks.updateProposal="http://172.28.3.111/regulatora/governance/api/v1/governance-actions/%s/identity"
