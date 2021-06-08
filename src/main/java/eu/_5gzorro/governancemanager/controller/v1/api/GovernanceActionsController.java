@@ -89,6 +89,6 @@ public interface GovernanceActionsController {
             @ApiResponse(responseCode = "404", description = "A proposal with the specified Id was not found",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @PutMapping("{id}/identity")
+    @PostMapping("{id}/identity")
     ResponseEntity updateProposalIdentity(@Valid @PathVariable final UUID id, @Valid @RequestBody final DIDStateDto state) throws IOException;
 }

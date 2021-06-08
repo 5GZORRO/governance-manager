@@ -3,6 +3,8 @@ package eu._5gzorro.governancemanager.controller.v1.api;
 import eu._5gzorro.governancemanager.controller.v1.request.governanceActions.ProposeGovernanceDecisionRequest;
 import eu._5gzorro.governancemanager.controller.v1.response.PagedGovernanceProposalsResponse;
 import eu._5gzorro.governancemanager.dto.GovernanceProposalDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.CredentialOfferDto;
+import eu._5gzorro.governancemanager.dto.identityPermissions.CredentialPreviewDto;
 import eu._5gzorro.governancemanager.dto.identityPermissions.DIDStateDto;
 import eu._5gzorro.governancemanager.model.AuthData;
 import eu._5gzorro.governancemanager.model.enumeration.GovernanceActionType;
@@ -87,7 +89,24 @@ public class GovernanceActionsControllerImpl implements GovernanceActionsControl
 
     @Override
     public ResponseEntity updateProposalIdentity(@Valid UUID id, @Valid DIDStateDto state) throws IOException {
-        governanceProposalService.completeGovernanceProposalCreation(id, state);
+
+        CredentialOfferDto offer = state.getCredentialOffer();
+
+        // return oK for status updates prior to the credential being issued
+        if(offer == null)
+            return ResponseEntity.ok().build();
+
+        CredentialPreviewDto preview = offer.getCredentialPreview();
+
+        if(preview == null)
+            return ResponseEntity.ok().build();
+
+        String did = state.getCredentialOffer().getCredentialPreview().getDid();
+
+        if(did == null)
+            return ResponseEntity.badRequest().build();
+
+        governanceProposalService.completeGovernanceProposalCreation(id, did);
         return ResponseEntity.ok().build();
     }
 }

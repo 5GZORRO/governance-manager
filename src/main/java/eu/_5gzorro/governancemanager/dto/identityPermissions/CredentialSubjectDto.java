@@ -1,15 +1,10 @@
 package eu._5gzorro.governancemanager.dto.identityPermissions;
 
-import javax.validation.constraints.NotBlank;
-import java.util.List;
 import java.util.Objects;
 
+
 public class CredentialSubjectDto {
-
-    @NotBlank
     private String id;
-
-    private List<ClaimDto> claims;
 
     public CredentialSubjectDto() {
     }
@@ -20,14 +15,6 @@ public class CredentialSubjectDto {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public List<ClaimDto> getClaims() {
-        return claims;
-    }
-
-    public void setClaims(List<ClaimDto> claims) {
-        this.claims = claims;
     }
 
     @Override
@@ -45,9 +32,8 @@ public class CredentialSubjectDto {
 
     @Override
     public String toString() {
-        return "CredentialSubject{" +
+        return "CredentialSubjectDto{" +
                 "id='" + id + '\'' +
-                ", claims=" + claims +
                 '}';
     }
 }

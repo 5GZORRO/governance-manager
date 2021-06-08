@@ -51,5 +51,5 @@ public interface GovernanceProposalService {
      * @param id
      * @param state
      */
-    void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException;
+    void completeGovernanceProposalCreation(UUID id, String did) throws IOException;
 }

@@ -184,7 +184,7 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
 
     @Override
     @Transactional
-    public void completeGovernanceProposalCreation(UUID id, DIDStateDto state) throws IOException {
+    public void completeGovernanceProposalCreation(UUID id, String did) throws IOException {
 
         GovernanceProposal proposal = governanceProposalRepository.findById(id)
                 .orElseThrow(() -> new GovernanceProposalNotFoundException(id.toString()));
@@ -192,7 +192,7 @@ public class GovernanceProposalServiceImpl implements GovernanceProposalService 
         if(proposal.getStatus() != GovernanceProposalStatus.CREATING)
             throw new GovernanceProposalStatusException(GovernanceProposalStatus.CREATING, proposal.getStatus());
 
-        proposal.setDid(state.getDid());
+        proposal.setDid(did);
         proposal.setUpdated(LocalDateTime.now());
 
         final boolean canIssueCredential = governanceService.canIssueCredential(proposal);
